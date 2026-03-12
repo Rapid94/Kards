@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html><head>
+<meta charset="UTF-8">
+<title>Cube Animation 3 - Draw In</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { background: #000; display: flex; align-items: center; justify-content: center; min-height: 100vh; overflow: hidden; }
+.label { position: fixed; top: 30px; left: 50%; transform: translateX(-50%); color: #555; font-family: sans-serif; font-size: 14px; letter-spacing: 3px; text-transform: uppercase; }
+
+.cube-scene {
+  width: 500px; height: 500px;
+  perspective: 1200px;
+}
+.cube {
+  width: 400px; height: 400px;
+  position: relative;
+  transform-style: preserve-3d;
+  margin: 50px auto;
+}
+.cube-face {
+  position: absolute;
+  width: 400px; height: 400px;
+  left: 0; top: 0;
+  overflow: hidden;
+}
+.cube-face-inner {
+  width: 100%; height: 100%;
+  border: 1px solid rgba(255,255,255,0.15);
+  background:
+    repeating-linear-gradient(0deg, transparent, transparent 49px, rgba(255,255,255,0.08) 49px, rgba(255,255,255,0.08) 50px),
+    repeating-linear-gradient(90deg, transparent, transparent 49px, rgba(255,255,255,0.08) 49px, rgba(255,255,255,0.08) 50px);
+  clip-path: inset(0 100% 0 0);
+  transition: clip-path 1s cubic-bezier(0.25, 0.1, 0.25, 1);
+}
+.cube-face-inner.revealed {
+  clip-path: inset(0 0 0 0);
+}
+
+.cube-front  { transform: translateZ(200px); }
+.cube-back   { transform: translateZ(-200px); }
+.cube-left   { transform: rotateY(-90deg) translateZ(200px); }
+.cube-right  { transform: rotateY(90deg) translateZ(200px); }
+.cube-top    { transform: rotateX(90deg) translateZ(200px); }
+.cube-bottom { transform: rotateX(-90deg) translateZ(200px); }
+
+.cube-card {
+  position: absolute;
+  width: 80px; height: 80px;
+  border-radius: 6px;
+  transform-style: preserve-3d;
+  opacity: 0;
+  transform: translateZ(30px) scale(0.8);
+  transition: opacity 0.5s ease, transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.cube-card.visible {
+  opacity: 1;
+  transform: translateZ(30px) scale(1);
+}
+.c1 { background: rgba(150,140,170,0.85); top: 40px; left: 40px; }
+.c2 { background: rgba(200,180,165,0.85); top: 40px; left: 240px; }
+.c3 { background: rgba(210,230,215,0.85); top: 160px; left: 140px; }
+.c4 { background: rgba(160,110,85,0.85); top: 280px; left: 40px; }
+.c5 { background: rgba(200,195,175,0.85); top: 280px; left: 240px; }
+.c6 { background: rgba(120,150,190,0.85); top: 160px; left: 300px; }
+</style>
+</head>
+<body>
+<div class="label">3 / 6 &mdash; Draw In (grid lines reveal like a sketch)</div>
+<div class="cube-scene">
+  <div class="cube" id="cube">
+    <div class="cube-face cube-front"><div class="cube-face-inner" data-delay="0"></div></div>
+    <div class="cube-face cube-back"><div class="cube-face-inner" data-delay="100"></div></div>
+    <div class="cube-face cube-left"><div class="cube-face-inner" data-delay="200"></div></div>
+    <div class="cube-face cube-right"><div class="cube-face-inner" data-delay="300"></div></div>
+    <div class="cube-face cube-top"><div class="cube-face-inner" data-delay="400"></div></div>
+    <div class="cube-face cube-bottom"><div class="cube-face-inner" data-delay="500"></div></div>
+    <div class="cube-card c1"></div>
+    <div class="cube-card c2"></div>
+    <div class="cube-card c3"></div>
+    <div class="cube-card c4"></div>
+    <div class="cube-card c5"></div>
+    <div class="cube-card c6"></div>
+  </div>
+</div>
+<script>
+var cube = document.getElementById('cube');
+var rotX = -20, rotY = -30;
+
+// Reveal faces with stagger
+document.querySelectorAll('.cube-face-inner').forEach(function(inner) {
+  var delay = parseInt(inner.dataset.delay);
+  setTimeout(function() {
+    inner.classList.add('revealed');
+  }, 400 + delay);
+});
+
+// Cards appear after faces
+document.querySelectorAll('.cube-card').forEach(function(card, i) {
+  setTimeout(function() {
+    card.classList.add('visible');
+  }, 1400 + i * 150);
+});
+
+// Auto-rotate
+setTimeout(function() {
+  function animate() {
+    rotY += 0.05;
+    cube.style.transform = 'rotateX(' + rotX + 'deg) rotateY(' + rotY + 'deg)';
+    requestAnimationFrame(animate);
+  }
+  animate();
+}, 200);
+</script>
+</body></html>

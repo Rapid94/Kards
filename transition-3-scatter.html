@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kards – Cards Scatter</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Bricolage+Grotesque:wght@800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --text: #1a1a1a;
+    --bg: #f2f0e9;
+  }
+
+  *, *::before, *::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  html, body {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+  }
+
+  /* Intro Overlay */
+  .pc-intro-overlay {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: var(--bg);
+    z-index: 3;
+    transition: opacity 0.6s ease;
+    pointer-events: none;
+  }
+  .pc-intro-overlay.hidden {
+    opacity: 0;
+  }
+
+  /* Kards Text */
+  .pc-kards-text {
+    position: fixed;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 51;
+    font-family: 'Bricolage Grotesque', sans-serif;
+    font-weight: 800;
+    font-size: clamp(80px, 12vw, 180px);
+    letter-spacing: -0.03em;
+    color: var(--text);
+    pointer-events: none;
+    user-select: none;
+    white-space: nowrap;
+    line-height: 1;
+  }
+  .pc-kards-text.below-cards {
+    z-index: 1;
+  }
+  .pc-letter {
+    display: inline-block;
+    transition: opacity 0.25s ease;
+  }
+  .pc-letter.obscured {
+    opacity: 0;
+  }
+
+  /* Parallax Scene */
+  .pc-parallax-section {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    overflow: hidden;
+    z-index: 2;
+  }
+  .pc-scene {
+    position: absolute;
+    top: -900px;
+    left: -900px;
+    right: -900px;
+    bottom: -900px;
+    z-index: 2;
+  }
+
+  /* Cards */
+  .p-card {
+    position: absolute;
+    border-radius: 10px;
+    cursor: pointer;
+    opacity: 0;
+    transform: scale(0.7) rotate(var(--tilt, 0deg));
+    transition: transform 0.6s cubic-bezier(0.34, 1.3, 0.64, 1), opacity 0.3s ease, box-shadow 0.5s ease;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.10);
+    will-change: transform, opacity;
+  }
+  .p-card.visible {
+    opacity: 0.88;
+    transform: scale(1) rotate(var(--tilt, 0deg));
+  }
+  .p-card:hover {
+    opacity: 0.92 !important;
+    transform: scale(1.06) rotate(var(--tilt, 0deg)) !important;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.18);
+    z-index: 10;
+  }
+  .p-card.hidden-card {
+    opacity: 0;
+    transform: scale(0.5) rotate(var(--tilt, 0deg));
+  }
+  .p-card.hidden-card.visible {
+    opacity: 0.45;
+    transform: scale(1) rotate(var(--tilt, 0deg));
+  }
+</style>
+</head>
+<body>
+
+<!-- Title Badge -->
+<div style="position:fixed;top:20px;left:20px;z-index:200;background:#1a1a1a;color:#fff;padding:8px 16px;border-radius:100px;font-family:Inter,sans-serif;font-size:13px;font-weight:600">3. Cards Scatter</div>
+
+<!-- Intro Overlay -->
+<div class="pc-intro-overlay" id="introOverlay"></div>
+
+<!-- Kards Text -->
+<div class="pc-kards-text" id="kardsText">
+  <span class="pc-letter">K</span><span class="pc-letter">a</span><span class="pc-letter">r</span><span class="pc-letter">d</span><span class="pc-letter">s</span>
+</div>
+
+<!-- Parallax Section -->
+<div class="pc-parallax-section">
+  <div class="pc-scene" id="scene"></div>
+</div>
+
+<script>
+(function() {
+  // ---- Card Data ----
+  var visibleCards = [
+    { w: 240, h: 280, x: 10, y: -10, bg: '#a87860' },
+    { w: 300, h: 200, x: 42, y: -6, bg: '#9898c0' },
+    { w: 260, h: 240, x: 74, y: -8, bg: '#c8b898' },
+    { w: 150, h: 220, x: -6, y: 18, bg: '#d8b0b8' },
+    { w: 140, h: 200, x: -5, y: 50, bg: '#585e30' },
+    { w: 350, h: 300, x: 10, y: 26, bg: '#3e6b58' },
+    { w: 300, h: 260, x: 44, y: 12, bg: '#dcbaa8' },
+    { w: 380, h: 380, x: 60, y: 28, bg: '#d4e0d0' },
+    { w: 180, h: 260, x: 90, y: 18, bg: '#c4b0a0' },
+    { w: 280, h: 310, x: 6, y: 60, bg: '#c8b848' },
+    { w: 250, h: 230, x: 82, y: 54, bg: '#d6d0c8' },
+    { w: 360, h: 220, x: 30, y: 78, bg: '#b8a070' },
+    { w: 280, h: 200, x: 8, y: 88, bg: '#c0b0a0' },
+    { w: 240, h: 220, x: 68, y: 84, bg: '#a87860' }
+  ];
+
+  var hiddenCards = [];
+
+  // Muted colors for hidden cards
+  var mutedColors = [
+    '#b0a898', '#a8a0a0', '#989890', '#a09888', '#908880',
+    '#988878', '#a89888', '#908878', '#b0a090', '#989080',
+    '#a8a098', '#b0a898', '#908880', '#a09080', '#989890',
+    '#b0a890', '#a89080', '#988878', '#a8a098', '#908878',
+    '#a09888', '#b0a898', '#989080', '#908880', '#a8a0a0',
+    '#b0a090', '#989890', '#a09080', '#988878', '#a89888',
+    '#908878', '#b0a898', '#a8a098', '#989080', '#908880',
+    '#a09888'
+  ];
+
+  // Left edge cards
+  for (var i = 0; i < 8; i++) {
+    hiddenCards.push({
+      w: 180 + Math.floor(Math.random() * 120),
+      h: 180 + Math.floor(Math.random() * 120),
+      x: -20 - Math.floor(Math.random() * 28),
+      y: -10 + Math.floor(Math.random() * 110),
+      bg: mutedColors[i]
+    });
+  }
+
+  // Right edge cards
+  for (var i = 0; i < 8; i++) {
+    hiddenCards.push({
+      w: 180 + Math.floor(Math.random() * 120),
+      h: 180 + Math.floor(Math.random() * 120),
+      x: 106 + Math.floor(Math.random() * 26),
+      y: -10 + Math.floor(Math.random() * 110),
+      bg: mutedColors[8 + i]
+    });
+  }
+
+  // Top edge cards
+  for (var i = 0; i < 8; i++) {
+    hiddenCards.push({
+      w: 180 + Math.floor(Math.random() * 140),
+      h: 180 + Math.floor(Math.random() * 100),
+      x: -10 + Math.floor(Math.random() * 110),
+      y: -24 - Math.floor(Math.random() * 28),
+      bg: mutedColors[16 + i]
+    });
+  }
+
+  // Bottom edge cards
+  for (var i = 0; i < 8; i++) {
+    hiddenCards.push({
+      w: 180 + Math.floor(Math.random() * 140),
+      h: 180 + Math.floor(Math.random() * 100),
+      x: -10 + Math.floor(Math.random() * 110),
+      y: 108 + Math.floor(Math.random() * 28),
+      bg: mutedColors[24 + i]
+    });
+  }
+
+  // Corner cards (4 corners)
+  hiddenCards.push({ w: 220, h: 200, x: -30, y: -34, bg: '#989080' });
+  hiddenCards.push({ w: 200, h: 220, x: 116, y: -38, bg: '#a09888' });
+  hiddenCards.push({ w: 240, h: 200, x: -28, y: 118, bg: '#908878' });
+  hiddenCards.push({ w: 200, h: 240, x: 120, y: 122, bg: '#b0a090' });
+
+  // ---- Create Card Elements ----
+  var scene = document.getElementById('scene');
+  var allCardEls = [];
+
+  function randomTilt() {
+    var deg = 10 + Math.random() * 8;
+    return (Math.random() < 0.5 ? -deg : deg);
+  }
+
+  function createCard(data, isHidden) {
+    var el = document.createElement('div');
+    el.className = 'p-card' + (isHidden ? ' hidden-card' : '');
+    el.style.width = data.w + 'px';
+    el.style.height = data.h + 'px';
+    el.style.left = 'calc(' + data.x + 'vw + 900px)';
+    el.style.top = 'calc(' + data.y + 'vh + 900px)';
+    el.style.backgroundColor = data.bg;
+    el.style.setProperty('--tilt', randomTilt() + 'deg');
+
+    // Click handler for scatter transition
+    el.addEventListener('click', function() {
+      if (document.body.classList.contains('scattering')) return;
+      document.body.classList.add('scattering');
+
+      var allCards = document.querySelectorAll('.p-card');
+      var centerX = window.innerWidth / 2;
+      var centerY = window.innerHeight / 2;
+
+      // Hide Kards text
+      document.getElementById('kardsText').style.transition = 'opacity 0.4s ease';
+      document.getElementById('kardsText').style.opacity = '0';
+
+      allCards.forEach(function(card) {
+        var rect = card.getBoundingClientRect();
+        var cardCX = rect.left + rect.width / 2;
+        var cardCY = rect.top + rect.height / 2;
+        var dx = cardCX - centerX;
+        var dy = cardCY - centerY;
+        var dist = Math.sqrt(dx * dx + dy * dy) || 1;
+        var nx = dx / dist;
+        var ny = dy / dist;
+        var flyDist = 2000 + Math.random() * 1000;
+        var rot = (Math.random() - 0.5) * 90;
+
+        // Clicked card scales up first
+        if (card === el) {
+          card.style.transition = 'transform 0.15s ease';
+          card.style.transform = 'scale(1.15) rotate(var(--tilt))';
+          setTimeout(function() {
+            card.style.transition = 'transform 0.8s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.6s ease';
+            card.style.transform = 'translate(' + (nx * flyDist) + 'px, ' + (ny * flyDist) + 'px) rotate(' + rot + 'deg) scale(1.1)';
+            card.style.opacity = '0';
+          }, 120);
+        } else {
+          card.style.transition = 'transform 0.8s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.6s ease';
+          card.style.transform = 'translate(' + (nx * flyDist) + 'px, ' + (ny * flyDist) + 'px) rotate(' + rot + 'deg)';
+          card.style.opacity = '0';
+        }
+      });
+
+      setTimeout(function() { window.location.href = 'home.html'; }, 850);
+    });
+
+    scene.appendChild(el);
+    allCardEls.push({ el: el, data: data, isHidden: isHidden });
+    return el;
+  }
+
+  // Create visible cards
+  visibleCards.forEach(function(c) { createCard(c, false); });
+  // Create hidden cards
+  hiddenCards.forEach(function(c) { createCard(c, true); });
+
+  // ---- Intro Sequence ----
+  var introOverlay = document.getElementById('introOverlay');
+  var kardsText = document.getElementById('kardsText');
+
+  setTimeout(function() {
+    // Hide intro overlay
+    introOverlay.classList.add('hidden');
+
+    // Drop kards text z-index
+    kardsText.classList.add('below-cards');
+
+    // Stagger in cards
+    var cards = document.querySelectorAll('.p-card');
+    cards.forEach(function(card, i) {
+      setTimeout(function() {
+        card.classList.add('visible');
+      }, i * 40);
+    });
+  }, 100);
+
+  // ---- Parallax ----
+  var SENSITIVITY = 0.35;
+  var LERP = 0.09;
+  var MAX = 1170;
+
+  var targetX = 0;
+  var targetY = 0;
+  var currentX = 0;
+  var currentY = 0;
+
+  document.addEventListener('mousemove', function(e) {
+    var dx = (e.clientX - window.innerWidth / 2) / (window.innerWidth / 2);
+    var dy = (e.clientY - window.innerHeight / 2) / (window.innerHeight / 2);
+    targetX = -dx * MAX * SENSITIVITY;
+    targetY = -dy * MAX * SENSITIVITY;
+  });
+
+  // ---- Letter Overlap Check ----
+  var letters = document.querySelectorAll('.pc-letter');
+
+  function rectsOverlap(r1, r2) {
+    return !(r1.right < r2.left || r1.left > r2.right || r1.bottom < r2.top || r1.top > r2.bottom);
+  }
+
+  function checkLetterOverlap() {
+    var letterRects = [];
+    letters.forEach(function(letter) {
+      letterRects.push({
+        el: letter,
+        rect: letter.getBoundingClientRect()
+      });
+    });
+
+    var visibleCardEls = document.querySelectorAll('.p-card.visible:not(.hidden-card)');
+
+    letterRects.forEach(function(lr) {
+      var isObscured = false;
+      visibleCardEls.forEach(function(card) {
+        var cardRect = card.getBoundingClientRect();
+        if (rectsOverlap(lr.rect, cardRect)) {
+          isObscured = true;
+        }
+      });
+      if (isObscured) {
+        lr.el.classList.add('obscured');
+      } else {
+        lr.el.classList.remove('obscured');
+      }
+    });
+  }
+
+  // ---- Animation Loop ----
+  function animate() {
+    currentX += (targetX - currentX) * LERP;
+    currentY += (targetY - currentY) * LERP;
+
+    scene.style.transform = 'translate(' + currentX + 'px, ' + currentY + 'px)';
+
+    checkLetterOverlap();
+    requestAnimationFrame(animate);
+  }
+  requestAnimationFrame(animate);
+
+})();
+</script>
+</body>
+</html>

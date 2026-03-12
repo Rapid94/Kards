@@ -1,0 +1,57 @@
+<svg width="800" height="900" viewBox="0 0 800 900" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Shadow/Reflection -->
+  <g id="Shadow">
+    <ellipse cx="400" cy="750" rx="220" ry="40" fill="url(#shadowGrad)" opacity="0.5"/>
+  </g>
+
+  <!-- Base Platform -->
+  <g id="Base-Platform">
+    <path d="M200 680 L400 750 L600 680 L400 610 Z" fill="#1a1a1a" stroke="#2a2a2a" stroke-width="1"/>
+    <path d="M200 680 L200 695 L400 765 L400 750 Z" fill="#111111" stroke="#2a2a2a" stroke-width="0.5"/>
+    <path d="M600 680 L600 695 L400 765 L400 750 Z" fill="#151515" stroke="#2a2a2a" stroke-width="0.5"/>
+  </g>
+
+  <!-- Card 1 - Bottom -->
+  <g id="Card-1-Bottom">
+    <path d="M200 570 L400 640 L600 570 L400 500 Z" fill="#1c1c1c" stroke="#333" stroke-width="0.5"/>
+    <path d="M200 570 L200 588 L400 658 L400 640 Z" fill="#161616" stroke="#333" stroke-width="0.5"/>
+    <path d="M600 570 L600 588 L400 658 L400 640 Z" fill="#1a1a1a" stroke="#333" stroke-width="0.5"/>
+  </g>
+
+  <!-- Card 2 -->
+  <g id="Card-2">
+    <path d="M200 470 L400 540 L600 470 L400 400 Z" fill="#1e1e1e" stroke="#383838" stroke-width="0.5"/>
+    <path d="M200 470 L200 488 L400 558 L400 540 Z" fill="#181818" stroke="#383838" stroke-width="0.5"/>
+    <path d="M600 470 L600 488 L400 558 L400 540 Z" fill="#1c1c1c" stroke="#383838" stroke-width="0.5"/>
+  </g>
+
+  <!-- Card 3 -->
+  <g id="Card-3">
+    <path d="M200 370 L400 440 L600 370 L400 300 Z" fill="#222222" stroke="#3d3d3d" stroke-width="0.5"/>
+    <path d="M200 370 L200 388 L400 458 L400 440 Z" fill="#1c1c1c" stroke="#3d3d3d" stroke-width="0.5"/>
+    <path d="M600 370 L600 388 L400 458 L400 440 Z" fill="#202020" stroke="#3d3d3d" stroke-width="0.5"/>
+  </g>
+
+  <!-- Card 4 - Top -->
+  <g id="Card-4-Top">
+    <path d="M200 270 L400 340 L600 270 L400 200 Z" fill="#282828" stroke="#444" stroke-width="0.5"/>
+    <path d="M200 270 L200 288 L400 358 L400 340 Z" fill="#202020" stroke="#444" stroke-width="0.5"/>
+    <path d="M600 270 L600 288 L400 358 L400 340 Z" fill="#242424" stroke="#444" stroke-width="0.5"/>
+  </g>
+
+  <!-- Subtle top highlight -->
+  <g id="Top-Highlight">
+    <path d="M200 270 L400 340 L600 270 L400 200 Z" fill="url(#topHighlight)" opacity="0.08"/>
+  </g>
+
+  <defs>
+    <radialGradient id="shadowGrad" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.15"/>
+      <stop offset="100%" stop-color="#000000" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="topHighlight" x1="400" y1="200" x2="400" y2="340" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="100%" stop-color="#000000"/>
+    </linearGradient>
+  </defs>
+</svg>

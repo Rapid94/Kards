@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Blue Lines Background</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  background: #f9f9f9;
+  min-height: 100vh;
+  overflow: hidden;
+  position: relative;
+}
+.circle {
+  position: absolute;
+  border-radius: 50%;
+  border: 1px solid rgba(140, 160, 210, 0.35);
+}
+/* Large circle - top right, sweeping down-left */
+.circle-1 {
+  width: 1600px;
+  height: 1600px;
+  top: -500px;
+  right: -400px;
+}
+/* Medium circle - center left, sweeping right */
+.circle-2 {
+  width: 1200px;
+  height: 1200px;
+  top: -100px;
+  left: -300px;
+}
+/* Smaller circle - bottom area */
+.circle-3 {
+  width: 900px;
+  height: 900px;
+  bottom: -300px;
+  right: -100px;
+}
+</style>
+</head>
+<body>
+  <div class="circle circle-1"></div>
+  <div class="circle circle-2"></div>
+  <div class="circle circle-3"></div>
+</body>
+</html>

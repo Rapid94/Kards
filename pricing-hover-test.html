@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Pricing Hover Animations</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@200;800&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #000;
+    color: #fff;
+    font-family: 'Bricolage Grotesque', sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    gap: 80px;
+    padding: 80px 0;
+  }
+  .option {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+  }
+  .label {
+    font-size: 14px;
+    color: #555;
+    font-weight: 200;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+  a {
+    font-size: 18px;
+    font-weight: 800;
+    color: #fff;
+    text-decoration: none;
+    cursor: pointer;
+    position: relative;
+  }
+
+  /* ─── VERSION 1: Letter spread + underline from center ─── */
+  .v1 {
+    transition: letter-spacing 0.3s ease;
+  }
+  .v1::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 50%;
+    width: 0;
+    height: 1.5px;
+    background: #fff;
+    transition: width 0.3s ease, left 0.3s ease;
+  }
+  .v1:hover {
+    letter-spacing: 2px;
+  }
+  .v1:hover::after {
+    width: 100%;
+    left: 0;
+  }
+
+  /* ─── VERSION 2: Glitch/stagger ─── */
+  .v2 span {
+    display: inline-block;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+  }
+  .v2:hover span {
+    animation: glitchUp 0.4s ease forwards;
+  }
+  .v2:hover span:nth-child(1) { animation-delay: 0s; }
+  .v2:hover span:nth-child(2) { animation-delay: 0.03s; }
+  .v2:hover span:nth-child(3) { animation-delay: 0.06s; }
+  .v2:hover span:nth-child(4) { animation-delay: 0.09s; }
+  .v2:hover span:nth-child(5) { animation-delay: 0.12s; }
+  .v2:hover span:nth-child(6) { animation-delay: 0.15s; }
+  .v2:hover span:nth-child(7) { animation-delay: 0.18s; }
+  @keyframes glitchUp {
+    0%   { transform: translateY(0); opacity: 1; }
+    30%  { transform: translateY(-8px); opacity: 0; }
+    60%  { transform: translateY(4px); opacity: 0; }
+    100% { transform: translateY(0); opacity: 1; }
+  }
+
+  /* ─── VERSION 3: Underline slide left-to-right + color fade ─── */
+  .v3 {
+    transition: color 0.3s ease;
+  }
+  .v3::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 0;
+    height: 1.5px;
+    background: #fff;
+    transition: width 0.4s cubic-bezier(0.25, 0.1, 0.25, 1);
+  }
+  .v3:hover {
+    color: #aaa;
+  }
+  .v3:hover::after {
+    width: 100%;
+  }
+
+  /* ─── VERSION 4: Background reveal (fill from left) ─── */
+  .v4 {
+    padding: 6px 14px;
+    transition: color 0.3s ease;
+    overflow: hidden;
+  }
+  .v4::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 0;
+    height: 100%;
+    background: #fff;
+    transition: width 0.35s cubic-bezier(0.25, 0.1, 0.25, 1);
+    z-index: -1;
+  }
+  .v4:hover {
+    color: #000;
+  }
+  .v4:hover::before {
+    width: 100%;
+  }
+
+  /* ─── VERSION 5: Scramble up (text rolls up, new text rolls in) ─── */
+  .v5 {
+    overflow: hidden;
+    height: 24px;
+    display: inline-flex;
+    flex-direction: column;
+    transition: none;
+  }
+  .v5 .v5-top,
+  .v5 .v5-bottom {
+    display: block;
+    height: 24px;
+    line-height: 24px;
+    transition: transform 0.35s cubic-bezier(0.76, 0, 0.24, 1);
+  }
+  .v5 .v5-bottom {
+    color: #888;
+  }
+  .v5:hover .v5-top,
+  .v5:hover .v5-bottom {
+    transform: translateY(-24px);
+  }
+</style>
+</head>
+<body>
+
+<div class="option">
+  <div class="label">Version 1 — Letter Spread + Underline</div>
+  <a class="v1" href="#">Pricing</a>
+</div>
+
+<div class="option">
+  <div class="label">Version 2 — Letter Glitch Stagger</div>
+  <a class="v2" href="#"><span>P</span><span>r</span><span>i</span><span>c</span><span>i</span><span>n</span><span>g</span></a>
+</div>
+
+<div class="option">
+  <div class="label">Version 3 — Slide Underline + Fade</div>
+  <a class="v3" href="#">Pricing</a>
+</div>
+
+<div class="option">
+  <div class="label">Version 4 — Background Fill</div>
+  <a class="v4" href="#">Pricing</a>
+</div>
+
+<div class="option">
+  <div class="label">Version 5 — Text Roll Up</div>
+  <a class="v5" href="#"><span class="v5-top">Pricing</span><span class="v5-bottom">Pricing</span></a>
+</div>
+
+</body>
+</html>

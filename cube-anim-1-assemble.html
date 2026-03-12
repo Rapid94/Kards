@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html><head>
+<meta charset="UTF-8">
+<title>Cube Animation 1 - Assemble</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { background: #000; display: flex; align-items: center; justify-content: center; min-height: 100vh; overflow: hidden; }
+.label { position: fixed; top: 30px; left: 50%; transform: translateX(-50%); color: #555; font-family: sans-serif; font-size: 14px; letter-spacing: 3px; text-transform: uppercase; }
+
+.cube-scene {
+  width: 500px; height: 500px;
+  perspective: 1200px;
+}
+.cube {
+  width: 400px; height: 400px;
+  position: relative;
+  transform-style: preserve-3d;
+  margin: 50px auto;
+}
+.cube-face {
+  position: absolute;
+  width: 400px; height: 400px;
+  border: 1px solid rgba(255,255,255,0.15);
+  background:
+    repeating-linear-gradient(0deg, transparent, transparent 49px, rgba(255,255,255,0.08) 49px, rgba(255,255,255,0.08) 50px),
+    repeating-linear-gradient(90deg, transparent, transparent 49px, rgba(255,255,255,0.08) 49px, rgba(255,255,255,0.08) 50px);
+  left: 0; top: 0;
+  opacity: 0;
+}
+
+/* Cards */
+.cube-card {
+  position: absolute;
+  width: 80px; height: 80px;
+  border-radius: 6px;
+  transform-style: preserve-3d;
+  opacity: 0;
+}
+.c1 { background: rgba(150,140,170,0.85); top: 40px; left: 40px; }
+.c2 { background: rgba(200,180,165,0.85); top: 40px; left: 240px; }
+.c3 { background: rgba(210,230,215,0.85); top: 160px; left: 140px; }
+.c4 { background: rgba(160,110,85,0.85); top: 280px; left: 40px; }
+.c5 { background: rgba(200,195,175,0.85); top: 280px; left: 240px; }
+.c6 { background: rgba(120,150,190,0.85); top: 160px; left: 300px; }
+</style>
+</head>
+<body>
+<div class="label">1 / 6 &mdash; Assemble (faces fly in, then cards pop)</div>
+<div class="cube-scene">
+  <div class="cube" id="cube">
+    <div class="cube-face" id="f-front"></div>
+    <div class="cube-face" id="f-back"></div>
+    <div class="cube-face" id="f-left"></div>
+    <div class="cube-face" id="f-right"></div>
+    <div class="cube-face" id="f-top"></div>
+    <div class="cube-face" id="f-bottom"></div>
+    <div class="cube-card c1"></div>
+    <div class="cube-card c2"></div>
+    <div class="cube-card c3"></div>
+    <div class="cube-card c4"></div>
+    <div class="cube-card c5"></div>
+    <div class="cube-card c6"></div>
+  </div>
+</div>
+<script>
+var cube = document.getElementById('cube');
+var faces = {
+  front:  document.getElementById('f-front'),
+  back:   document.getElementById('f-back'),
+  left:   document.getElementById('f-left'),
+  right:  document.getElementById('f-right'),
+  top:    document.getElementById('f-top'),
+  bottom: document.getElementById('f-bottom')
+};
+var cards = document.querySelectorAll('.cube-card');
+
+// Final positions
+var finalPos = {
+  front:  'translateZ(200px)',
+  back:   'translateZ(-200px)',
+  left:   'rotateY(-90deg) translateZ(200px)',
+  right:  'rotateY(90deg) translateZ(200px)',
+  top:    'rotateX(90deg) translateZ(200px)',
+  bottom: 'rotateX(-90deg) translateZ(200px)'
+};
+// Exploded positions (far away)
+var startPos = {
+  front:  'translateZ(600px)',
+  back:   'translateZ(-600px)',
+  left:   'rotateY(-90deg) translateZ(600px)',
+  right:  'rotateY(90deg) translateZ(600px)',
+  top:    'rotateX(90deg) translateZ(600px)',
+  bottom: 'rotateX(-90deg) translateZ(600px)'
+};
+
+var rotX = -20, rotY = -30;
+cube.style.transform = 'rotateX(' + rotX + 'deg) rotateY(' + rotY + 'deg)';
+
+// Set start positions
+Object.keys(faces).forEach(function(key) {
+  faces[key].style.transform = startPos[key];
+  faces[key].style.transition = 'transform 1.2s cubic-bezier(0.23, 1, 0.32, 1), opacity 0.6s ease';
+});
+
+// Animate faces in with stagger
+var faceOrder = ['front', 'back', 'left', 'right', 'top', 'bottom'];
+faceOrder.forEach(function(key, i) {
+  setTimeout(function() {
+    faces[key].style.opacity = '1';
+    faces[key].style.transform = finalPos[key];
+  }, 200 + i * 150);
+});
+
+// Cards pop in after faces
+cards.forEach(function(card, i) {
+  card.style.transition = 'opacity 0.4s ease, transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)';
+  card.style.transform = 'translateZ(0px) scale(0.3)';
+  setTimeout(function() {
+    card.style.opacity = '1';
+    card.style.transform = 'translateZ(30px) scale(1)';
+  }, 1400 + i * 120);
+});
+
+// Start auto-rotate after assembly
+setTimeout(function() {
+  function animate() {
+    rotY += 0.05;
+    cube.style.transform = 'rotateX(' + rotX + 'deg) rotateY(' + rotY + 'deg)';
+    requestAnimationFrame(animate);
+  }
+  animate();
+}, 2200);
+</script>
+</body></html>

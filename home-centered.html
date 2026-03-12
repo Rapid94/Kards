@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kards — Turn Reviews into Social Media Content</title>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&family=Bricolage+Grotesque:wght@800&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+:root {
+  --cream: #f2f0e9;
+  --coral: #e8685a;
+  --coral-hover: #d4574a;
+  --dark: #1a1a1a;
+  --dark2: #2d2d2d;
+  --text: #1a1a1a;
+  --text2: #6b6b6b;
+  --white: #ffffff;
+  --radius: 100px;
+}
+html { font-size: 16px; scroll-behavior: smooth; }
+body {
+  font-family: 'Manrope', -apple-system, BlinkMacSystemFont, sans-serif;
+  color: var(--text);
+  background: #ffffff;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+a { text-decoration: none; color: inherit; }
+button { cursor: pointer; border: none; font-family: inherit; background: none; }
+
+/* ═══════════════════════════════════════════════════ */
+/*  NAVBAR                                             */
+/* ═══════════════════════════════════════════════════ */
+.navbar {
+  position: fixed;
+  top: 16px;
+  left: 0;
+  right: 0;
+  margin: 0 auto;
+  width: 100%;
+  max-width: 900px;
+  z-index: 100;
+  padding: 14px 28px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--white);
+  border-radius: 16px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+}
+.nav-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: -0.3px;
+  cursor: pointer;
+}
+.nav-logo img {
+  height: 44px;
+  width: auto;
+}
+.nav-links {
+  display: flex;
+  gap: 32px;
+}
+.nav-links a {
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--text2);
+  transition: color 0.2s;
+}
+.nav-links a:hover { color: var(--text); }
+.nav-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.btn-login {
+  padding: 10px 24px;
+  background: var(--dark);
+  color: var(--white);
+  font-size: 15px;
+  font-weight: 600;
+  border-radius: var(--radius);
+  transition: all 0.2s;
+}
+.btn-login:hover { background: var(--dark2); }
+.btn-login:active { transform: scale(0.97); }
+
+/* ═══════════════════════════════════════════════════ */
+/*  HERO SECTION                                       */
+/* ═══════════════════════════════════════════════════ */
+.hero {
+  position: relative;
+  padding: 120px 40px 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.hero-content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  max-width: 900px;
+  padding-top: 60px;
+}
+
+/* Heading */
+.hero-heading {
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-size: 68px;
+  font-weight: 800;
+  line-height: 1.08;
+  letter-spacing: -2.5px;
+  color: var(--text);
+  margin-bottom: 24px;
+  max-width: 820px;
+}
+
+/* Subtitle */
+.hero-sub {
+  font-size: 18px;
+  line-height: 1.65;
+  color: var(--text2);
+  max-width: 520px;
+  margin-bottom: 40px;
+}
+
+/* CTA buttons */
+.hero-ctas {
+  display: flex;
+  gap: 14px;
+  margin-bottom: 70px;
+}
+.btn-cta {
+  padding: 18px 52px;
+  font-size: 17px;
+  font-weight: 600;
+  border-radius: var(--radius);
+  transition: all 0.2s;
+}
+.btn-cta-primary {
+  background: var(--dark);
+  color: var(--white);
+}
+.btn-cta-primary:hover { background: var(--dark2); }
+.btn-cta-primary:active { transform: scale(0.97); }
+
+/* ═══════════════════════════════════════════════════ */
+/*  HOW IT WORKS — STEPS                               */
+/* ═══════════════════════════════════════════════════ */
+.steps-section {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 40px 100px;
+}
+.steps-label {
+  text-align: center;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text2);
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  margin-bottom: 48px;
+}
+.steps-row {
+  display: flex;
+  gap: 20px;
+}
+.step-card {
+  flex: 1;
+  border-radius: 24px;
+  overflow: hidden;
+  border: 1px solid rgba(0,0,0,0.06);
+  display: flex;
+  flex-direction: column;
+}
+.step-card-illustration {
+  height: 320px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 32px;
+}
+.step-card:nth-child(1) .step-card-illustration {
+  background: linear-gradient(135deg, #e8f4ec, #c6e2d0);
+}
+.step-card:nth-child(2) .step-card-illustration {
+  background: linear-gradient(135deg, #dce8f8, #b8cff0);
+}
+.step-card:nth-child(3) .step-card-illustration {
+  background: linear-gradient(135deg, #f5e6d0, #ebd3b5);
+}
+.step-card-illustration img {
+  max-width: 280px;
+  max-height: 280px;
+}
+.step-card-body {
+  padding: 28px 28px 32px;
+  background: var(--white);
+}
+.step-number {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--dark);
+  color: var(--white);
+  font-size: 13px;
+  font-weight: 700;
+  margin-bottom: 16px;
+}
+.step-title {
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  color: var(--text);
+  margin-bottom: 10px;
+}
+.step-desc {
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--text2);
+}
+
+/* ═══════════════════════════════════════════════════ */
+/*  PRODUCT MOCKUP                                     */
+/* ═══════════════════════════════════════════════════ */
+.mockup-wrapper {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 0 40px 80px;
+}
+.mockup-frame {
+  position: relative;
+  width: 100%;
+  background: var(--white);
+  border-radius: 20px;
+  box-shadow: 0 20px 80px rgba(0,0,0,0.1), 0 1px 3px rgba(0,0,0,0.06);
+  overflow: hidden;
+  border: 1px solid rgba(0,0,0,0.06);
+}
+.mockup-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 20px;
+  background: #fafafa;
+  border-bottom: 1px solid rgba(0,0,0,0.06);
+}
+.mockup-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #e0e0e0;
+}
+.mockup-dot:nth-child(1) { background: #ff6058; }
+.mockup-dot:nth-child(2) { background: #ffbd2e; }
+.mockup-dot:nth-child(3) { background: #27ca40; }
+.mockup-url {
+  flex: 1;
+  margin-left: 12px;
+  background: var(--white);
+  border-radius: 8px;
+  padding: 7px 16px;
+  font-size: 13px;
+  color: #999;
+  border: 1px solid rgba(0,0,0,0.06);
+}
+.mockup-body {
+  display: flex;
+  height: 480px;
+}
+.mock-sidebar {
+  width: 260px;
+  background: #fafafa;
+  border-right: 1px solid rgba(0,0,0,0.06);
+  padding: 24px 20px;
+  flex-shrink: 0;
+}
+.mock-sidebar-title {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  color: #aaa;
+  margin-bottom: 16px;
+}
+.mock-template {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 12px;
+  cursor: default;
+}
+.mock-template-thumb {
+  width: 52px;
+  height: 52px;
+  border-radius: 10px;
+  flex-shrink: 0;
+}
+.mock-template-info {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 4px;
+}
+.mock-template-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+}
+.mock-template-desc {
+  font-size: 11px;
+  color: #aaa;
+}
+.mock-template.active .mock-template-thumb {
+  outline: 2px solid var(--coral);
+  outline-offset: 2px;
+}
+.mock-preview {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f8f8f6;
+  padding: 40px;
+}
+.mock-card {
+  width: 320px;
+  background: var(--dark);
+  border-radius: 16px;
+  padding: 36px 32px 32px;
+  color: var(--white);
+}
+.mock-stars {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 20px;
+}
+.mock-star {
+  width: 20px;
+  height: 20px;
+  background: #f0c27f;
+  clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+}
+.mock-quote {
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 1.55;
+  margin-bottom: 24px;
+  color: rgba(255,255,255,0.9);
+}
+.mock-reviewer {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.mock-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #3e6b58;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 600;
+  color: white;
+}
+.mock-reviewer-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: rgba(255,255,255,0.7);
+}
+.mock-reviewer-source {
+  font-size: 11px;
+  color: rgba(255,255,255,0.4);
+}
+.mock-controls {
+  width: 220px;
+  background: #fafafa;
+  border-left: 1px solid rgba(0,0,0,0.06);
+  padding: 24px 20px;
+  flex-shrink: 0;
+}
+.mock-control-group { margin-bottom: 20px; }
+.mock-control-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  color: #aaa;
+  margin-bottom: 10px;
+}
+.mock-color-row { display: flex; gap: 8px; }
+.mock-color-swatch {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  border: 2px solid transparent;
+  cursor: default;
+}
+.mock-color-swatch.active { border-color: var(--coral); }
+.mock-slider-track {
+  width: 100%;
+  height: 6px;
+  background: #e0e0e0;
+  border-radius: 3px;
+  position: relative;
+  margin-top: 8px;
+}
+.mock-slider-fill { height: 100%; border-radius: 3px; background: var(--coral); }
+.mock-slider-thumb {
+  width: 14px; height: 14px; border-radius: 50%;
+  background: var(--white); border: 2px solid var(--coral);
+  position: absolute; top: -4px;
+}
+.mock-toggle-row {
+  display: flex; justify-content: space-between; align-items: center; margin-top: 8px;
+}
+.mock-toggle-text { font-size: 13px; color: var(--text2); }
+.mock-toggle {
+  width: 36px; height: 20px; border-radius: 10px;
+  background: var(--coral); position: relative;
+}
+.mock-toggle::after {
+  content: ''; position: absolute; top: 3px; right: 3px;
+  width: 14px; height: 14px; border-radius: 50%; background: var(--white);
+}
+.mock-toggle.off { background: #ddd; }
+.mock-toggle.off::after { right: auto; left: 3px; }
+
+/* ═══════════════════════════════════════════════════ */
+/*  CARD SHRINK ENTRANCE                               */
+/* ═══════════════════════════════════════════════════ */
+.card-entrance-overlay {
+  position: fixed; inset: 0; z-index: 9999; pointer-events: none;
+  transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1),
+              opacity 0.4s ease 0.35s,
+              border-radius 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.card-entrance-overlay.shrink { transform: scale(0); opacity: 0; border-radius: 50%; }
+
+/* ═══════════════════════════════════════════════════ */
+/*  ENTRANCE ANIMATIONS                                */
+/* ═══════════════════════════════════════════════════ */
+.entrance-fade-up { opacity: 0; transform: translateY(28px); }
+.entrance-fade-up.animate {
+  animation: entranceFadeUp 0.7s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+@keyframes entranceFadeUp { to { opacity: 1; transform: translateY(0); } }
+.entrance-d1 { animation-delay: 0.1s; }
+.entrance-d2 { animation-delay: 0.2s; }
+.entrance-d3 { animation-delay: 0.35s; }
+.entrance-d4 { animation-delay: 0.5s; }
+.entrance-d5 { animation-delay: 0.65s; }
+.entrance-d6 { animation-delay: 0.8s; }
+.entrance-slide-down { opacity: 0; margin-top: -20px; }
+.entrance-slide-down.animate {
+  animation: entranceSlideDown 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.05s forwards;
+}
+@keyframes entranceSlideDown { to { opacity: 1; margin-top: 0; } }
+.entrance-scale-in { opacity: 0; transform: scale(0.95); }
+.entrance-scale-in.animate {
+  animation: entranceScaleIn 0.8s cubic-bezier(0.22, 1, 0.36, 1) 0.1s forwards;
+}
+@keyframes entranceScaleIn { to { opacity: 1; transform: scale(1); } }
+
+/* ═══════════════════════════════════════════════════ */
+/*  RESPONSIVE                                         */
+/* ═══════════════════════════════════════════════════ */
+@media (max-width: 768px) {
+  .navbar { max-width: calc(100% - 32px); top: 10px; padding: 12px 16px; }
+  .nav-links { display: none; }
+  .hero { padding: 100px 16px 0; }
+  .hero-heading { font-size: 36px; letter-spacing: -1.5px; }
+  .hero-sub { font-size: 16px; }
+  .hero-ctas { flex-direction: column; width: 100%; max-width: 300px; }
+  .btn-cta { text-align: center; }
+  .steps-section { padding: 0 16px 60px; }
+  .steps-row { flex-direction: column; }
+  .step-card-illustration { height: 240px; }
+  .mockup-wrapper { padding: 0 16px 40px; }
+  .mock-sidebar, .mock-controls { display: none; }
+  .mockup-body { height: 340px; }
+}
+</style>
+</head>
+<body>
+
+<nav class="navbar entrance-slide-down">
+  <div class="nav-logo" onclick="window.location.href='index.html'">
+    <img src="Kards logo.svg" alt="Kards">
+  </div>
+  <div class="nav-links">
+    <a href="#">Product</a>
+    <a href="#">Resources</a>
+    <a href="#">Blog</a>
+    <a href="#">Pricing</a>
+  </div>
+  <div class="nav-right">
+    <button class="btn-login">Login</button>
+  </div>
+</nav>
+
+<section class="hero">
+  <div class="hero-content">
+    <h1 class="hero-heading entrance-fade-up entrance-d2">
+      Effortless Social Media Presence For Your Business
+    </h1>
+    <p class="hero-sub entrance-fade-up entrance-d3">
+      Turn your best Google reviews into stunning, branded social media graphics. Pick a review, customize the design, and download. All in seconds.
+    </p>
+    <div class="hero-ctas entrance-fade-up entrance-d4">
+      <button class="btn-cta btn-cta-primary" onclick="window.location.href='app.html'">Get Started for Free</button>
+    </div>
+  </div>
+</section>
+
+<div class="steps-section entrance-fade-up entrance-d5">
+  <div class="steps-label">How It Works</div>
+  <div class="steps-row">
+    <div class="step-card">
+      <div class="step-card-illustration">
+        <img src="Online-Test-2--Streamline-Milano.png" alt="Find your business">
+      </div>
+      <div class="step-card-body">
+        <div class="step-number">1</div>
+        <div class="step-title">Find Your Business</div>
+        <p class="step-desc">Search your business name and Kards pulls all your Google reviews automatically.</p>
+      </div>
+    </div>
+    <div class="step-card">
+      <div class="step-card-illustration">
+        <img src="Work-Collaboration-2--Streamline-Milano.png" alt="Pick your best reviews">
+      </div>
+      <div class="step-card-body">
+        <div class="step-number">2</div>
+        <div class="step-title">Pick Your Best Reviews</div>
+        <p class="step-desc">We surface your highest-rated reviews. Choose the ones that tell your story best.</p>
+      </div>
+    </div>
+    <div class="step-card">
+      <div class="step-card-illustration">
+        <img src="illu.svg" alt="Customize and share">
+      </div>
+      <div class="step-card-body">
+        <div class="step-number">3</div>
+        <div class="step-title">Customize & Export</div>
+        <p class="step-desc">Style your review card with templates and branding, then download and share on social media.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="mockup-wrapper entrance-fade-up entrance-d5">
+  <div class="mockup-frame">
+    <div class="mockup-bar">
+      <div class="mockup-dot"></div>
+      <div class="mockup-dot"></div>
+      <div class="mockup-dot"></div>
+      <div class="mockup-url">kards.app/editor</div>
+    </div>
+    <div class="mockup-body">
+      <div class="mock-sidebar">
+        <div class="mock-sidebar-title">Templates</div>
+        <div class="mock-template active">
+          <div class="mock-template-thumb" style="background:#1a1a1a"></div>
+          <div class="mock-template-info">
+            <div class="mock-template-name">Dark Elegant</div>
+            <div class="mock-template-desc">Bold & professional</div>
+          </div>
+        </div>
+        <div class="mock-template">
+          <div class="mock-template-thumb" style="background:linear-gradient(135deg,#f5d6c8,#e8847a)"></div>
+          <div class="mock-template-info">
+            <div class="mock-template-name">Warm Coral</div>
+            <div class="mock-template-desc">Friendly & inviting</div>
+          </div>
+        </div>
+        <div class="mock-template">
+          <div class="mock-template-thumb" style="background:#f2f0e9"></div>
+          <div class="mock-template-info">
+            <div class="mock-template-name">Clean Cream</div>
+            <div class="mock-template-desc">Minimal & classic</div>
+          </div>
+        </div>
+        <div class="mock-template">
+          <div class="mock-template-thumb" style="background:linear-gradient(135deg,#3e6b58,#2a4a3d)"></div>
+          <div class="mock-template-info">
+            <div class="mock-template-name">Forest</div>
+            <div class="mock-template-desc">Natural & earthy</div>
+          </div>
+        </div>
+        <div class="mock-template">
+          <div class="mock-template-thumb" style="background:linear-gradient(135deg,#5e81ac,#2e3440)"></div>
+          <div class="mock-template-info">
+            <div class="mock-template-name">Nordic Blue</div>
+            <div class="mock-template-desc">Cool & modern</div>
+          </div>
+        </div>
+      </div>
+      <div class="mock-preview">
+        <div class="mock-card">
+          <div class="mock-stars">
+            <div class="mock-star"></div><div class="mock-star"></div><div class="mock-star"></div><div class="mock-star"></div><div class="mock-star"></div>
+          </div>
+          <div class="mock-quote">"Absolutely incredible food and service. We'll definitely be coming back every week!"</div>
+          <div class="mock-reviewer">
+            <div class="mock-avatar">S</div>
+            <div>
+              <div class="mock-reviewer-name">Sarah M.</div>
+              <div class="mock-reviewer-source">Google Review</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="mock-controls">
+        <div class="mock-control-group">
+          <div class="mock-control-label">Background</div>
+          <div class="mock-color-row">
+            <div class="mock-color-swatch active" style="background:#1a1a1a"></div>
+            <div class="mock-color-swatch" style="background:#f2f0e9"></div>
+            <div class="mock-color-swatch" style="background:#3e6b58"></div>
+            <div class="mock-color-swatch" style="background:#e8685a"></div>
+            <div class="mock-color-swatch" style="background:#5e81ac"></div>
+          </div>
+        </div>
+        <div class="mock-control-group">
+          <div class="mock-control-label">Border Radius</div>
+          <div class="mock-slider-track">
+            <div class="mock-slider-fill" style="width:65%"></div>
+            <div class="mock-slider-thumb" style="left:calc(65% - 7px)"></div>
+          </div>
+        </div>
+        <div class="mock-control-group">
+          <div class="mock-control-label">Font Size</div>
+          <div class="mock-slider-track">
+            <div class="mock-slider-fill" style="width:45%"></div>
+            <div class="mock-slider-thumb" style="left:calc(45% - 7px)"></div>
+          </div>
+        </div>
+        <div class="mock-control-group">
+          <div class="mock-control-label">Options</div>
+          <div class="mock-toggle-row">
+            <span class="mock-toggle-text">Show stars</span>
+            <div class="mock-toggle"></div>
+          </div>
+          <div class="mock-toggle-row">
+            <span class="mock-toggle-text">Show logo</span>
+            <div class="mock-toggle"></div>
+          </div>
+          <div class="mock-toggle-row">
+            <span class="mock-toggle-text">Shadow</span>
+            <div class="mock-toggle off"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function() {
+  var params = new URLSearchParams(window.location.search);
+  var fromCards = params.get('from') === 'cards';
+  var color = params.get('color') || '#c8b898';
+  var shrinkDelay = fromCards ? 150 : 0;
+  var contentDelay = fromCards ? 500 : 50;
+  if (fromCards) {
+    var ov = document.createElement('div');
+    ov.className = 'card-entrance-overlay';
+    ov.style.background = color;
+    document.body.appendChild(ov);
+    setTimeout(function() { ov.classList.add('shrink'); }, shrinkDelay);
+    setTimeout(function() { ov.remove(); }, shrinkDelay + 1000);
+  }
+  setTimeout(function() {
+    document.querySelectorAll('.entrance-fade-up, .entrance-slide-down, .entrance-scale-in').forEach(function(el) {
+      el.classList.add('animate');
+    });
+  }, contentDelay);
+})();
+</script>
+
+</body>
+</html>

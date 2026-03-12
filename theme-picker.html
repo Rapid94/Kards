@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Theme Picker — Kards</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Bricolage+Grotesque:wght@800&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: 'Inter', sans-serif;
+  background: #f2f0e9;
+  min-height: 100vh;
+  padding: 60px 40px;
+}
+h1 {
+  text-align: center;
+  font-size: 18px;
+  font-weight: 600;
+  color: #888;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 50px;
+}
+.grid {
+  max-width: 1100px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 28px;
+}
+.theme-card {
+  border-radius: 20px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease;
+  border: 3px solid transparent;
+}
+.theme-card:hover {
+  transform: scale(1.02);
+  box-shadow: 0 16px 50px rgba(0,0,0,0.12);
+}
+.theme-card.selected {
+  border-color: #e8685a;
+  box-shadow: 0 0 0 4px rgba(232,104,90,0.2);
+}
+.theme-preview {
+  position: relative;
+  height: 280px;
+  overflow: hidden;
+}
+.theme-preview .mini-card {
+  position: absolute;
+  border-radius: 6px;
+}
+.theme-preview .kards-label {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-size: 36px;
+  font-weight: 800;
+  letter-spacing: -1.5px;
+}
+.theme-info {
+  padding: 20px 24px;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.theme-info .name {
+  font-size: 16px;
+  font-weight: 700;
+  color: #1a1a1a;
+}
+.theme-info .desc {
+  font-size: 13px;
+  color: #999;
+  margin-top: 2px;
+}
+.theme-info .badge {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 4px 12px;
+  border-radius: 100px;
+  background: #f0f0f0;
+  color: #666;
+}
+.theme-info .badge.current {
+  background: #e8685a;
+  color: #fff;
+}
+
+@media (max-width: 700px) {
+  .grid { grid-template-columns: 1fr; }
+  body { padding: 40px 16px; }
+  .theme-preview { height: 200px; }
+}
+</style>
+</head>
+<body>
+
+<h1>Pick a theme for Kards</h1>
+
+<div class="grid">
+
+  <!-- 1. CREAM / EARTH (current) -->
+  <div class="theme-card selected" onclick="pick(this)" data-theme="cream">
+    <div class="theme-preview" style="background:#f2f0e9">
+      <div class="mini-card" style="width:90px;height:110px;top:-10px;left:30px;background:#a87860"></div>
+      <div class="mini-card" style="width:110px;height:80px;top:-5px;left:55%;background:#9898c0"></div>
+      <div class="mini-card" style="width:80px;height:100px;top:-8px;right:40px;background:#c8b898"></div>
+      <div class="mini-card" style="width:50px;height:80px;top:30px;left:-10px;background:#d8b0b8"></div>
+      <div class="mini-card" style="width:130px;height:100px;top:70px;left:20px;background:#3e6b58"></div>
+      <div class="mini-card" style="width:100px;height:90px;top:50px;left:52%;background:#dcbaa8"></div>
+      <div class="mini-card" style="width:140px;height:130px;top:80px;right:15px;background:#d4e0d0"></div>
+      <div class="mini-card" style="width:60px;height:90px;top:55px;right:-5px;background:#c4b0a0"></div>
+      <div class="mini-card" style="width:100px;height:110px;bottom:-15px;left:15px;background:#c8b848"></div>
+      <div class="mini-card" style="width:130px;height:80px;bottom:-10px;left:45%;background:#b8a070"></div>
+      <div class="mini-card" style="width:90px;height:80px;bottom:-5px;right:30px;background:#d6d0c8"></div>
+      <span class="kards-label" style="color:#1a1a1a">Kards</span>
+    </div>
+    <div class="theme-info">
+      <div>
+        <div class="name">Cream Earth</div>
+        <div class="desc">Warm, muted pastels on cream</div>
+      </div>
+      <span class="badge current">Current</span>
+    </div>
+  </div>
+
+  <!-- 2. MIDNIGHT -->
+  <div class="theme-card" onclick="pick(this)" data-theme="midnight">
+    <div class="theme-preview" style="background:#1a1d2e">
+      <div class="mini-card" style="width:90px;height:110px;top:-10px;left:30px;background:#4a3f6b"></div>
+      <div class="mini-card" style="width:110px;height:80px;top:-5px;left:55%;background:#2d5a6b"></div>
+      <div class="mini-card" style="width:80px;height:100px;top:-8px;right:40px;background:#6b4a5a"></div>
+      <div class="mini-card" style="width:50px;height:80px;top:30px;left:-10px;background:#3d5a4a"></div>
+      <div class="mini-card" style="width:130px;height:100px;top:70px;left:20px;background:#8b6a4a"></div>
+      <div class="mini-card" style="width:100px;height:90px;top:50px;left:52%;background:#5a4a6b"></div>
+      <div class="mini-card" style="width:140px;height:130px;top:80px;right:15px;background:#2a4a5a"></div>
+      <div class="mini-card" style="width:60px;height:90px;top:55px;right:-5px;background:#6b5a3d"></div>
+      <div class="mini-card" style="width:100px;height:110px;bottom:-15px;left:15px;background:#4a6b5a"></div>
+      <div class="mini-card" style="width:130px;height:80px;bottom:-10px;left:45%;background:#5a3d4a"></div>
+      <div class="mini-card" style="width:90px;height:80px;bottom:-5px;right:30px;background:#3a4a60"></div>
+      <span class="kards-label" style="color:#c8c0d8">Kards</span>
+    </div>
+    <div class="theme-info">
+      <div>
+        <div class="name">Midnight</div>
+        <div class="desc">Deep navy with muted jewel tones</div>
+      </div>
+      <span class="badge">New</span>
+    </div>
+  </div>
+
+  <!-- 3. NORD / ARCTIC -->
+  <div class="theme-card" onclick="pick(this)" data-theme="arctic">
+    <div class="theme-preview" style="background:#eceff4">
+      <div class="mini-card" style="width:90px;height:110px;top:-10px;left:30px;background:#5e81ac"></div>
+      <div class="mini-card" style="width:110px;height:80px;top:-5px;left:55%;background:#81a1c1"></div>
+      <div class="mini-card" style="width:80px;height:100px;top:-8px;right:40px;background:#88c0d0"></div>
+      <div class="mini-card" style="width:50px;height:80px;top:30px;left:-10px;background:#b48ead"></div>
+      <div class="mini-card" style="width:130px;height:100px;top:70px;left:20px;background:#a3be8c"></div>
+      <div class="mini-card" style="width:100px;height:90px;top:50px;left:52%;background:#d08770"></div>
+      <div class="mini-card" style="width:140px;height:130px;top:80px;right:15px;background:#8fbcbb"></div>
+      <div class="mini-card" style="width:60px;height:90px;top:55px;right:-5px;background:#bf616a"></div>
+      <div class="mini-card" style="width:100px;height:110px;bottom:-15px;left:15px;background:#ebcb8b"></div>
+      <div class="mini-card" style="width:130px;height:80px;bottom:-10px;left:45%;background:#5e81ac"></div>
+      <div class="mini-card" style="width:90px;height:80px;bottom:-5px;right:30px;background:#a3be8c"></div>
+      <span class="kards-label" style="color:#2e3440">Kards</span>
+    </div>
+    <div class="theme-info">
+      <div>
+        <div class="name">Nord / Arctic</div>
+        <div class="desc">Cool Scandinavian palette</div>
+      </div>
+      <span class="badge">New</span>
+    </div>
+  </div>
+
+  <!-- 4. WARM SAND -->
+  <div class="theme-card" onclick="pick(this)" data-theme="sand">
+    <div class="theme-preview" style="background:#f5ebe0">
+      <div class="mini-card" style="width:90px;height:110px;top:-10px;left:30px;background:#d4a373"></div>
+      <div class="mini-card" style="width:110px;height:80px;top:-5px;left:55%;background:#e6ccb2"></div>
+      <div class="mini-card" style="width:80px;height:100px;top:-8px;right:40px;background:#b08968"></div>
+      <div class="mini-card" style="width:50px;height:80px;top:30px;left:-10px;background:#ddb892"></div>
+      <div class="mini-card" style="width:130px;height:100px;top:70px;left:20px;background:#7f5539"></div>
+      <div class="mini-card" style="width:100px;height:90px;top:50px;left:52%;background:#c8a882"></div>
+      <div class="mini-card" style="width:140px;height:130px;top:80px;right:15px;background:#e6ccb2"></div>
+      <div class="mini-card" style="width:60px;height:90px;top:55px;right:-5px;background:#9c6644"></div>
+      <div class="mini-card" style="width:100px;height:110px;bottom:-15px;left:15px;background:#d4a373"></div>
+      <div class="mini-card" style="width:130px;height:80px;bottom:-10px;left:45%;background:#b08968"></div>
+      <div class="mini-card" style="width:90px;height:80px;bottom:-5px;right:30px;background:#ddb892"></div>
+      <span class="kards-label" style="color:#5c3d2e">Kards</span>
+    </div>
+    <div class="theme-info">
+      <div>
+        <div class="name">Warm Sand</div>
+        <div class="desc">Desert-inspired browns and tans</div>
+      </div>
+      <span class="badge">New</span>
+    </div>
+  </div>
+
+  <!-- 5. CHARCOAL -->
+  <div class="theme-card" onclick="pick(this)" data-theme="charcoal">
+    <div class="theme-preview" style="background:#2d2d2d">
+      <div class="mini-card" style="width:90px;height:110px;top:-10px;left:30px;background:#e8685a"></div>
+      <div class="mini-card" style="width:110px;height:80px;top:-5px;left:55%;background:#f0c27f"></div>
+      <div class="mini-card" style="width:80px;height:100px;top:-8px;right:40px;background:#a0d2db"></div>
+      <div class="mini-card" style="width:50px;height:80px;top:30px;left:-10px;background:#c8a2c8"></div>
+      <div class="mini-card" style="width:130px;height:100px;top:70px;left:20px;background:#7eb8a0"></div>
+      <div class="mini-card" style="width:100px;height:90px;top:50px;left:52%;background:#e8847a"></div>
+      <div class="mini-card" style="width:140px;height:130px;top:80px;right:15px;background:#f5d6c8"></div>
+      <div class="mini-card" style="width:60px;height:90px;top:55px;right:-5px;background:#b8d4e3"></div>
+      <div class="mini-card" style="width:100px;height:110px;bottom:-15px;left:15px;background:#d4a574"></div>
+      <div class="mini-card" style="width:130px;height:80px;bottom:-10px;left:45%;background:#98d1a8"></div>
+      <div class="mini-card" style="width:90px;height:80px;bottom:-5px;right:30px;background:#f0c27f"></div>
+      <span class="kards-label" style="color:#f0ebe4">Kards</span>
+    </div>
+    <div class="theme-info">
+      <div>
+        <div class="name">Charcoal</div>
+        <div class="desc">Dark background with vibrant pops</div>
+      </div>
+      <span class="badge">New</span>
+    </div>
+  </div>
+
+</div>
+
+<script>
+function pick(el) {
+  document.querySelectorAll('.theme-card').forEach(function(c) { c.classList.remove('selected'); });
+  el.classList.add('selected');
+}
+</script>
+
+</body>
+</html>

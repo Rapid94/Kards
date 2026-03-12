@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Line Animation 2 — Fade Trace</title>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&family=Source+Serif+4:ital,wght@1,500&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: 'Manrope', -apple-system, BlinkMacSystemFont, sans-serif;
+  background: #000;
+  color: #fff;
+  min-height: 100vh;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Navbar */
+.navbar {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 100;
+  padding: 26px 140px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #000;
+}
+.nav-logo {
+  font-size: 20px; font-weight: 800; letter-spacing: -0.3px;
+  opacity: 0; transform: translateY(-30px);
+}
+.nav-logo.animate { animation: slideDown 1.05s cubic-bezier(0.22, 1, 0.36, 1) 0.075s forwards; }
+.nav-right {
+  display: flex; gap: 32px; align-items: center;
+  opacity: 0; transform: translateY(-30px);
+}
+.nav-right.animate { animation: slideDown 1.05s cubic-bezier(0.22, 1, 0.36, 1) 0.15s forwards; }
+.nav-right a { font-size: 15px; font-weight: 500; color: #888; text-decoration: none; }
+.nav-right .btn-launch {
+  padding: 11px 32px; font-size: 18px; font-weight: 800;
+  border: 1px solid #555; color: #fff; background: #000;
+}
+
+/* Line containers */
+.line-wrapper {
+  position: fixed;
+  z-index: 99;
+  overflow: hidden;
+}
+.line-wrapper-h {
+  left: 0; right: 0; top: 105px; height: 1px;
+}
+.line-wrapper-v {
+  top: 105px; bottom: 0; width: 1px;
+}
+.lv1 { left: 64px; }
+.lv2 { left: 84px; }
+.lv3 { right: 64px; }
+.lv4 { right: 84px; }
+
+/* The actual line (drawn behind the dot) */
+.line-track {
+  position: absolute;
+  background: rgba(255,255,255,0.2);
+}
+.line-wrapper-h .line-track {
+  top: 0; left: 0; height: 100%; width: 0;
+}
+.line-wrapper-v .line-track {
+  top: 0; left: 0; width: 100%; height: 0;
+}
+
+/* Glowing tracer dot */
+.tracer {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.9);
+  box-shadow: 0 0 8px 3px rgba(255,255,255,0.5), 0 0 20px 6px rgba(255,255,255,0.2);
+  opacity: 0;
+}
+.line-wrapper-h .tracer {
+  width: 6px; height: 6px;
+  top: -2.5px; left: 0;
+}
+.line-wrapper-v .tracer {
+  width: 6px; height: 6px;
+  left: -2.5px; top: 0;
+}
+
+/* Hero Content */
+.hero { padding: 200px 64px 80px 140px; }
+.hero-tagline {
+  font-size: 16px; font-weight: 600; color: #888; letter-spacing: 0.5px; margin-bottom: 20px;
+  opacity: 0; transform: translateX(-60px);
+}
+.hero-tagline.animate { animation: slideLeft 1.05s cubic-bezier(0.22, 1, 0.36, 1) 0.15s forwards; }
+.hero-heading {
+  font-size: 72px; font-weight: 800; letter-spacing: -3px; line-height: 1.08;
+  max-width: 700px; margin-bottom: 24px;
+  opacity: 0; transform: translateX(-60px);
+}
+.hero-heading.animate { animation: slideLeft 1.05s cubic-bezier(0.22, 1, 0.36, 1) 0.3s forwards; }
+.hero-sub {
+  font-size: 18px; color: #888; line-height: 1.6; max-width: 500px;
+  opacity: 0; transform: translateX(-60px);
+}
+.hero-sub.animate { animation: slideLeft 1.05s cubic-bezier(0.22, 1, 0.36, 1) 0.5s forwards; }
+
+@keyframes slideDown { to { opacity: 1; transform: translateY(0); } }
+@keyframes slideLeft { to { opacity: 1; transform: translateX(0); } }
+</style>
+</head>
+<body>
+
+<div class="line-wrapper line-wrapper-h">
+  <div class="line-track"></div>
+  <div class="tracer"></div>
+</div>
+<div class="line-wrapper line-wrapper-v lv1">
+  <div class="line-track"></div>
+  <div class="tracer"></div>
+</div>
+<div class="line-wrapper line-wrapper-v lv2">
+  <div class="line-track"></div>
+  <div class="tracer"></div>
+</div>
+<div class="line-wrapper line-wrapper-v lv3">
+  <div class="line-track"></div>
+  <div class="tracer"></div>
+</div>
+<div class="line-wrapper line-wrapper-v lv4">
+  <div class="line-track"></div>
+  <div class="tracer"></div>
+</div>
+
+<nav class="navbar">
+  <div class="nav-logo">Kards</div>
+  <div class="nav-right">
+    <a href="#">Pricing</a>
+    <div class="btn-launch">Launch App</div>
+  </div>
+</nav>
+
+<section class="hero">
+  <div class="hero-tagline">No Designer<span style="font-family:'Source Serif 4',serif;font-style:italic">?</span> No Problem.</div>
+  <h1 class="hero-heading">Effortless Social Media</h1>
+  <p class="hero-sub">Turn your Google reviews into beautiful, branded social media graphics in seconds.</p>
+</section>
+
+<script>
+function animateTrace(wrapper, isHorizontal, delay) {
+  const track = wrapper.querySelector('.line-track');
+  const tracer = wrapper.querySelector('.tracer');
+  const duration = isHorizontal ? 1200 : 1000;
+  const ease = t => t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2; // easeInOutCubic
+
+  setTimeout(() => {
+    tracer.style.opacity = '1';
+    const start = performance.now();
+
+    function step(now) {
+      const elapsed = now - start;
+      const rawT = Math.min(elapsed / duration, 1);
+      const t = ease(rawT);
+
+      if (isHorizontal) {
+        const totalW = wrapper.offsetWidth;
+        tracer.style.left = (t * totalW) + 'px';
+        track.style.width = (t * 100) + '%';
+      } else {
+        const totalH = wrapper.offsetHeight;
+        tracer.style.top = (t * totalH) + 'px';
+        track.style.height = (t * 100) + '%';
+      }
+
+      if (rawT < 1) {
+        requestAnimationFrame(step);
+      } else {
+        // Fade out tracer
+        tracer.style.transition = 'opacity 0.4s';
+        tracer.style.opacity = '0';
+      }
+    }
+    requestAnimationFrame(step);
+  }, delay);
+}
+
+setTimeout(() => {
+  // Trigger text animations
+  document.querySelectorAll('.nav-logo, .nav-right, .hero-tagline, .hero-heading, .hero-sub').forEach(el => {
+    el.classList.add('animate');
+  });
+
+  // Trace lines
+  const wrappers = document.querySelectorAll('.line-wrapper');
+  animateTrace(wrappers[0], true, 0);    // horizontal
+  animateTrace(wrappers[1], false, 200);  // v1
+  animateTrace(wrappers[2], false, 300);  // v2
+  animateTrace(wrappers[3], false, 250);  // v3
+  animateTrace(wrappers[4], false, 350);  // v4
+}, 200);
+</script>
+</body>
+</html>

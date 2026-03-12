@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kards - Ripple Wipe</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Bricolage+Grotesque:wght@800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --text: #1a1a1a;
+    --bg: #f2f0e9;
+  }
+
+  *, *::before, *::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  html, body {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+  }
+
+  /* Intro Overlay */
+  #introOverlay {
+    position: fixed;
+    inset: 0;
+    background: var(--bg);
+    z-index: 3;
+    transition: opacity 0.6s ease;
+  }
+  #introOverlay.hide {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  /* Kards Text */
+  #kardsText {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 51;
+    font-family: 'Bricolage Grotesque', sans-serif;
+    font-weight: 800;
+    font-size: clamp(80px, 12vw, 180px);
+    color: var(--text);
+    letter-spacing: -0.02em;
+    pointer-events: none;
+    white-space: nowrap;
+    transition: z-index 0s;
+  }
+  #kardsText.lowered {
+    z-index: 1;
+  }
+
+  .pc-letter {
+    display: inline-block;
+    transition: opacity 0.25s ease;
+  }
+  .pc-letter.obscured {
+    opacity: 0;
+  }
+
+  /* Parallax Section */
+  #parallaxSection {
+    position: fixed;
+    inset: 0;
+    z-index: 2;
+    overflow: hidden;
+  }
+
+  #scene {
+    position: absolute;
+    inset: -900px;
+    z-index: 2;
+  }
+
+  /* Cards */
+  .p-card {
+    position: absolute;
+    border-radius: 10px;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+  }
+  .p-card.visible {
+    opacity: 1;
+  }
+  .p-card-face {
+    width: 100%;
+    height: 100%;
+    border-radius: 10px;
+    transition: transform 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94), box-shadow 0.35s ease, opacity 0.35s ease;
+  }
+  .p-card:hover .p-card-face {
+    opacity: 0.92;
+    transform: scale(1.06) rotate(var(--tilt));
+    box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+  }
+
+  /* Ripple Overlay */
+  #rippleOverlay {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    pointer-events: none;
+    overflow: hidden;
+  }
+</style>
+</head>
+<body>
+
+<!-- Title Badge -->
+<div style="position:fixed;top:20px;left:20px;z-index:200;background:#1a1a1a;color:#fff;padding:8px 16px;border-radius:100px;font-family:Inter,sans-serif;font-size:13px;font-weight:600">2. Ripple Wipe</div>
+
+<!-- Intro Overlay -->
+<div id="introOverlay"></div>
+
+<!-- Kards Text -->
+<div id="kardsText"></div>
+
+<!-- Parallax Section -->
+<div id="parallaxSection">
+  <div id="scene"></div>
+</div>
+
+<!-- Ripple Overlay -->
+<div id="rippleOverlay"></div>
+
+<script>
+(function() {
+  // ============================================================
+  // KARDS TEXT - split into letters
+  // ============================================================
+  var kardsText = document.getElementById('kardsText');
+  var letters = 'Kards'.split('');
+  letters.forEach(function(ch) {
+    var span = document.createElement('span');
+    span.className = 'pc-letter';
+    span.textContent = ch;
+    kardsText.appendChild(span);
+  });
+
+  // ============================================================
+  // CARD DATA
+  // ============================================================
+  var visibleCards = [
+    { w: 240, h: 280, x: 10, y: -10, bg: '#a87860' },
+    { w: 300, h: 200, x: 42, y: -6, bg: '#9898c0' },
+    { w: 260, h: 240, x: 74, y: -8, bg: '#c8b898' },
+    { w: 150, h: 220, x: -6, y: 18, bg: '#d8b0b8' },
+    { w: 140, h: 200, x: -5, y: 50, bg: '#585e30' },
+    { w: 350, h: 300, x: 10, y: 26, bg: '#3e6b58' },
+    { w: 300, h: 260, x: 44, y: 12, bg: '#dcbaa8' },
+    { w: 380, h: 380, x: 60, y: 28, bg: '#d4e0d0' },
+    { w: 180, h: 260, x: 90, y: 18, bg: '#c4b0a0' },
+    { w: 280, h: 310, x: 6, y: 60, bg: '#c8b848' },
+    { w: 250, h: 230, x: 82, y: 54, bg: '#d6d0c8' },
+    { w: 360, h: 220, x: 30, y: 78, bg: '#b8a070' },
+    { w: 280, h: 200, x: 8, y: 88, bg: '#c0b0a0' },
+    { w: 240, h: 220, x: 68, y: 84, bg: '#a87860' }
+  ];
+
+  var hiddenColors = [
+    '#c8c0b8', '#d0c8b0', '#a8b8a8', '#b8b0a0', '#c0b8b0',
+    '#b0a898', '#d8d0c0', '#c0c8b8', '#b8c0b0', '#a8a098',
+    '#c8d0c0', '#d0c0b8', '#b0b8a8', '#c0b0a8', '#d8c8b8',
+    '#a0b0a0', '#c8b8b0', '#b8a8a0', '#d0d8c8', '#c0c0b0',
+    '#b0a8a0', '#c8c8b8', '#d0c8c0', '#a8b0a0', '#b8b8a8',
+    '#c0c8c0', '#d8d0c8', '#b0b0a8', '#c8c0b0', '#a8a8a0',
+    '#d0d0c8', '#b8c0b8', '#c0b8a8', '#d8c8c0', '#b0a8b0',
+    '#c8b8a8'
+  ];
+
+  var hiddenCards = [
+    // Left edge cards (x: -20 to -48)
+    { w: 220, h: 260, x: -20, y: 10, bg: hiddenColors[0] },
+    { w: 260, h: 200, x: -30, y: 30, bg: hiddenColors[1] },
+    { w: 200, h: 280, x: -25, y: 50, bg: hiddenColors[2] },
+    { w: 240, h: 240, x: -35, y: 70, bg: hiddenColors[3] },
+    { w: 180, h: 220, x: -22, y: 85, bg: hiddenColors[4] },
+    { w: 280, h: 200, x: -40, y: 15, bg: hiddenColors[5] },
+    { w: 220, h: 260, x: -48, y: 45, bg: hiddenColors[6] },
+    { w: 260, h: 220, x: -38, y: 65, bg: hiddenColors[7] },
+    { w: 200, h: 200, x: -28, y: 90, bg: hiddenColors[8] },
+
+    // Right edge cards (x: 106 to 132)
+    { w: 240, h: 240, x: 106, y: 10, bg: hiddenColors[9] },
+    { w: 200, h: 280, x: 115, y: 30, bg: hiddenColors[10] },
+    { w: 260, h: 200, x: 110, y: 55, bg: hiddenColors[11] },
+    { w: 220, h: 260, x: 120, y: 75, bg: hiddenColors[12] },
+    { w: 280, h: 220, x: 108, y: 85, bg: hiddenColors[13] },
+    { w: 200, h: 240, x: 125, y: 20, bg: hiddenColors[14] },
+    { w: 240, h: 200, x: 132, y: 50, bg: hiddenColors[15] },
+    { w: 220, h: 280, x: 118, y: 65, bg: hiddenColors[16] },
+    { w: 260, h: 220, x: 128, y: 40, bg: hiddenColors[17] },
+
+    // Top edge cards (y: -24 to -52)
+    { w: 260, h: 220, x: 15, y: -24, bg: hiddenColors[18] },
+    { w: 220, h: 240, x: 35, y: -32, bg: hiddenColors[19] },
+    { w: 240, h: 200, x: 55, y: -28, bg: hiddenColors[20] },
+    { w: 200, h: 260, x: 75, y: -36, bg: hiddenColors[21] },
+    { w: 280, h: 220, x: 25, y: -44, bg: hiddenColors[22] },
+    { w: 220, h: 200, x: 50, y: -48, bg: hiddenColors[23] },
+    { w: 260, h: 240, x: 70, y: -52, bg: hiddenColors[24] },
+
+    // Bottom edge cards (y: 108 to 136)
+    { w: 240, h: 260, x: 15, y: 108, bg: hiddenColors[25] },
+    { w: 280, h: 200, x: 35, y: 115, bg: hiddenColors[26] },
+    { w: 200, h: 240, x: 55, y: 112, bg: hiddenColors[27] },
+    { w: 260, h: 220, x: 75, y: 120, bg: hiddenColors[28] },
+    { w: 220, h: 260, x: 25, y: 128, bg: hiddenColors[29] },
+    { w: 240, h: 200, x: 50, y: 136, bg: hiddenColors[30] },
+
+    // Corner cards
+    { w: 220, h: 220, x: -30, y: -30, bg: hiddenColors[31] },
+    { w: 240, h: 240, x: 115, y: -35, bg: hiddenColors[32] },
+    { w: 200, h: 200, x: -35, y: 115, bg: hiddenColors[33] },
+    { w: 260, h: 260, x: 120, y: 110, bg: hiddenColors[34] },
+    { w: 230, h: 230, x: -42, y: -45, bg: hiddenColors[35] }
+  ];
+
+  var allCards = visibleCards.concat(hiddenCards);
+
+  // ============================================================
+  // BUILD CARDS
+  // ============================================================
+  var scene = document.getElementById('scene');
+  var cardElements = [];
+
+  function randomTilt() {
+    var angle = 10 + Math.random() * 8; // 10-18 deg
+    if (Math.random() > 0.5) angle = -angle;
+    return angle;
+  }
+
+  allCards.forEach(function(card, i) {
+    var el = document.createElement('div');
+    el.className = 'p-card';
+    var tilt = randomTilt();
+    el.style.cssText = 'width:' + card.w + 'px;height:' + card.h + 'px;' +
+      'left:calc(' + card.x + 'vw + 900px);top:calc(' + card.y + 'vh + 900px);' +
+      '--tilt:' + tilt + 'deg;';
+
+    var face = document.createElement('div');
+    face.className = 'p-card-face';
+    face.style.background = card.bg;
+    face.style.transform = 'rotate(' + tilt + 'deg)';
+
+    el.appendChild(face);
+    scene.appendChild(el);
+    cardElements.push(el);
+
+    // Ripple transition on click
+    el.addEventListener('click', function(e) {
+      var faceBg = face.style.background;
+      var ripple = document.getElementById('rippleOverlay');
+      var circle = document.createElement('div');
+      var x = e.clientX;
+      var y = e.clientY;
+      var size = Math.max(window.innerWidth, window.innerHeight) * 2.5;
+      circle.style.cssText = 'position:absolute;border-radius:50%;background:' + faceBg +
+        ';width:' + size + 'px;height:' + size + 'px;left:' + (x - size / 2) + 'px;top:' + (y - size / 2) +
+        'px;transform:scale(0);transition:transform 0.7s cubic-bezier(0.4, 0, 0.2, 1)';
+      ripple.appendChild(circle);
+      circle.offsetHeight; // force reflow
+      circle.style.transform = 'scale(1)';
+      setTimeout(function() {
+        window.location.href = 'home.html';
+      }, 750);
+    });
+  });
+
+  // ============================================================
+  // INTRO SEQUENCE (100ms delay for demo)
+  // ============================================================
+  var introOverlay = document.getElementById('introOverlay');
+
+  setTimeout(function() {
+    // Hide intro overlay
+    introOverlay.classList.add('hide');
+
+    // Lower kardsText z-index
+    kardsText.classList.add('lowered');
+
+    // Stagger fade in cards
+    cardElements.forEach(function(el, i) {
+      setTimeout(function() {
+        el.classList.add('visible');
+      }, i * 30);
+    });
+  }, 100);
+
+  // ============================================================
+  // PARALLAX MOUSE TRACKING (delta-based)
+  // ============================================================
+  var SENSITIVITY = 0.35;
+  var LERP = 0.09;
+  var MAX = 1170;
+
+  var targetX = 0;
+  var targetY = 0;
+  var currentX = 0;
+  var currentY = 0;
+  var lastMouseX = null;
+  var lastMouseY = null;
+
+  document.addEventListener('mousemove', function(e) {
+    if (lastMouseX === null) {
+      lastMouseX = e.clientX;
+      lastMouseY = e.clientY;
+      return;
+    }
+
+    var deltaX = e.clientX - lastMouseX;
+    var deltaY = e.clientY - lastMouseY;
+
+    lastMouseX = e.clientX;
+    lastMouseY = e.clientY;
+
+    targetX += deltaX * SENSITIVITY;
+    targetY += deltaY * SENSITIVITY;
+
+    // Clamp
+    targetX = Math.max(-MAX, Math.min(MAX, targetX));
+    targetY = Math.max(-MAX, Math.min(MAX, targetY));
+  });
+
+  // ============================================================
+  // ANIMATION LOOP
+  // ============================================================
+  var letterSpans = document.querySelectorAll('.pc-letter');
+
+  function animate() {
+    // Lerp current towards target
+    currentX += (targetX - currentX) * LERP;
+    currentY += (targetY - currentY) * LERP;
+
+    // Apply transform to scene
+    scene.style.transform = 'translate(' + currentX + 'px, ' + currentY + 'px)';
+
+    // Letter overlap detection
+    var letterRects = [];
+    letterSpans.forEach(function(span) {
+      letterRects.push(span.getBoundingClientRect());
+    });
+
+    letterSpans.forEach(function(span, li) {
+      var lr = letterRects[li];
+      var isObscured = false;
+
+      for (var ci = 0; ci < cardElements.length; ci++) {
+        var card = cardElements[ci];
+        if (!card.classList.contains('visible')) continue;
+        var cr = card.getBoundingClientRect();
+
+        // Check overlap
+        if (
+          lr.left < cr.right &&
+          lr.right > cr.left &&
+          lr.top < cr.bottom &&
+          lr.bottom > cr.top
+        ) {
+          isObscured = true;
+          break;
+        }
+      }
+
+      if (isObscured) {
+        span.classList.add('obscured');
+      } else {
+        span.classList.remove('obscured');
+      }
+    });
+
+    requestAnimationFrame(animate);
+  }
+
+  requestAnimationFrame(animate);
+})();
+</script>
+</body>
+</html>

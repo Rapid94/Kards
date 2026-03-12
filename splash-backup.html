@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kards — Turn Reviews into Social Media Content</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Bricolage+Grotesque:wght@800&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+:root {
+  --text: #1a1a1a;
+  --bg: #ffffff;
+}
+html, body {
+  height: 100%;
+  overflow: hidden;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  background: var(--bg);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ═══════════════════════════════════════ */
+/*  WHITE OVERLAY (hides cards during intro) */
+/* ═══════════════════════════════════════ */
+.intro-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 3;
+  background: var(--bg);
+}
+.intro-overlay.hide {
+  display: none;
+}
+
+/* ═══════════════════════════════════════ */
+/*  SINGLE "KARDS" TEXT (always present)   */
+/* ═══════════════════════════════════════ */
+.kards-text {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 51;
+  pointer-events: none;
+  text-align: center;
+}
+.kards-text .pc-name {
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-size: 72px;
+  font-weight: 800;
+  letter-spacing: -3px;
+  color: var(--text);
+  line-height: 1;
+  opacity: 0;
+  animation: introFadeIn 1.2s ease 0.3s forwards;
+}
+@keyframes introFadeIn {
+  0%   { opacity: 0; transform: translateY(12px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+.pc-letter {
+  display: inline-block;
+  transition: opacity 0.3s ease;
+}
+.pc-letter.obscured {
+  opacity: 0;
+}
+@media (max-width: 768px) {
+  .kards-text .pc-name { font-size: 42px; }
+}
+
+/* ═══════════════════════════════════════ */
+/*  PARALLAX CARDS                         */
+/* ═══════════════════════════════════════ */
+.parallax-section {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  cursor: default;
+}
+
+.parallax-scene {
+  position: absolute;
+  top: -1350px;
+  left: -1350px;
+  right: -1350px;
+  bottom: -1350px;
+  will-change: transform;
+  z-index: 2;
+}
+
+.p-card {
+  position: absolute;
+  border-radius: 10px;
+  cursor: pointer;
+  overflow: hidden;
+  will-change: transform;
+  transition: transform 0.6s cubic-bezier(0.34, 1.3, 0.64, 1), opacity 0.3s ease, box-shadow 0.5s ease;
+  opacity: 0;
+}
+.p-card.card-visible {
+  opacity: 1;
+}
+.p-card:hover {
+  opacity: 0.92 !important;
+  z-index: 10;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+  transform: scale(1.06) rotate(var(--tilt));
+}
+
+.p-card-face {
+  position: absolute;
+  inset: 0;
+  border-radius: 10px;
+}
+
+/* ═══════════════════════════════════════ */
+/*  CARD EXPAND TRANSITION                 */
+/* ═══════════════════════════════════════ */
+.expand-overlay {
+  position: fixed;
+  z-index: 200;
+  border-radius: 10px;
+  pointer-events: none;
+  transition: all 0.55s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.expand-overlay.fullscreen {
+  top: 0 !important;
+  left: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  border-radius: 0;
+}
+</style>
+</head>
+<body>
+
+<!-- White overlay (sits above cards, below text) -->
+<div class="intro-overlay" id="introOverlay"></div>
+
+<!-- Single "Kards" text (above everything during intro, drops below cards after) -->
+<div class="kards-text" id="kardsText">
+  <div class="pc-name"><span class="pc-letter">K</span><span class="pc-letter">a</span><span class="pc-letter">r</span><span class="pc-letter">d</span><span class="pc-letter">s</span></div>
+</div>
+
+<!-- Parallax cards -->
+<section class="parallax-section" id="parallaxSection">
+  <div class="parallax-scene" id="parallaxScene"></div>
+</section>
+
+<script>
+(function() {
+  var overlay = document.getElementById('introOverlay');
+  var kardsText = document.getElementById('kardsText');
+  var scene = document.getElementById('parallaxScene');
+  if (!scene) return;
+
+  var OFFSET = 1350;
+
+  /*
+   * HARD RULES (matching palette.supply exactly):
+   * 1. NO overlapping — every card has clear cream gap around it
+   * 2. NO rotation — all cards are straight rectangles
+   * 3. 14 visible cards — edges clipped, center open around "Kards"
+   * 4. Cards are LARGE (250-400px) with generous spacing
+   * 5. Muted earthy/pastel colors only
+   * 6. Border-radius: 10px, no shadows, no borders
+   * 7. Edge cards are partially clipped (only 30-60% visible)
+   */
+
+  var cards = [
+    // ══════════════════════════════════════
+    //  14 VISIBLE CARDS (shuffled layout + swapped colors)
+    // ══════════════════════════════════════
+
+    // -- Top edge (partially clipped at top) --
+    { w: 240, h: 280, x: 10,  y: -10, bg: '#a87860' },
+    { w: 300, h: 200, x: 42,  y: -6,  bg: '#9898c0' },
+    { w: 260, h: 240, x: 74,  y: -8,  bg: '#c8b898' },
+
+    // -- Left edge (partially clipped) --
+    { w: 150, h: 220, x: -6,  y: 18,  bg: '#d8b0b8' },
+    { w: 140, h: 200, x: -5,  y: 50,  bg: '#585e30' },
+
+    // -- Main area (spaced out, center open for "Kards") --
+    { w: 350, h: 300, x: 10,  y: 26,  bg: '#3e6b58' },
+    { w: 300, h: 260, x: 44,  y: 12,  bg: '#dcbaa8' },
+
+    // -- Right side --
+    { w: 380, h: 380, x: 60,  y: 28,  bg: '#d4e0d0' },
+    { w: 180, h: 260, x: 90,  y: 18,  bg: '#c4b0a0' },
+
+    // -- Lower area --
+    { w: 280, h: 310, x: 6,   y: 60,  bg: '#c8b848' },
+    { w: 250, h: 230, x: 82,  y: 54,  bg: '#d6d0c8' },
+
+    // -- Bottom edge (partially clipped at bottom) --
+    { w: 360, h: 220, x: 30,  y: 78,  bg: '#b8a070' },
+    { w: 280, h: 200, x: 8,   y: 88,  bg: '#c0b0a0' },
+    { w: 240, h: 220, x: 68,  y: 84,  bg: '#a87860' },
+
+    // ══════════════════════════════════════
+    //  HIDDEN LEFT (2 layers)
+    // ══════════════════════════════════════
+    { w: 300, h: 340, x: -24, y: -6,  bg: '#c8c0b8' },
+    { w: 280, h: 270, x: -20, y: 26,  bg: '#d0c8b0' },
+    { w: 310, h: 300, x: -26, y: 54,  bg: '#a8b8a8' },
+    { w: 270, h: 280, x: -22, y: 80,  bg: '#c0b0a0' },
+    { w: 320, h: 310, x: -44, y: -4,  bg: '#b8b0c0' },
+    { w: 290, h: 340, x: -40, y: 28,  bg: '#c0b8a8' },
+    { w: 310, h: 270, x: -48, y: 56,  bg: '#d8c8b0' },
+    { w: 280, h: 300, x: -42, y: 82,  bg: '#b0c0b0' },
+
+    // ══════════════════════════════════════
+    //  HIDDEN RIGHT (2 layers)
+    // ══════════════════════════════════════
+    { w: 290, h: 320, x: 108, y: -4,  bg: '#d0c0b0' },
+    { w: 310, h: 280, x: 112, y: 28,  bg: '#c8a0a0' },
+    { w: 270, h: 310, x: 106, y: 56,  bg: '#a8c0a8' },
+    { w: 300, h: 270, x: 110, y: 82,  bg: '#d8c8b8' },
+    { w: 320, h: 300, x: 128, y: -2,  bg: '#c0a8b0' },
+    { w: 290, h: 330, x: 132, y: 30,  bg: '#d0b8a8' },
+    { w: 310, h: 280, x: 126, y: 58,  bg: '#b0b8c0' },
+    { w: 280, h: 310, x: 130, y: 84,  bg: '#c8c0a8' },
+
+    // ══════════════════════════════════════
+    //  HIDDEN TOP (2 layers)
+    // ══════════════════════════════════════
+    { w: 300, h: 270, x: -2,  y: -28, bg: '#c8b8b0' },
+    { w: 270, h: 250, x: 26,  y: -24, bg: '#d0b898' },
+    { w: 310, h: 280, x: 52,  y: -30, bg: '#a8b0a0' },
+    { w: 280, h: 260, x: 78,  y: -26, bg: '#c0b090' },
+    { w: 320, h: 300, x: 0,   y: -50, bg: '#d0c8c0' },
+    { w: 280, h: 280, x: 28,  y: -48, bg: '#c8d0b8' },
+    { w: 300, h: 270, x: 54,  y: -52, bg: '#b0b0c0' },
+    { w: 290, h: 290, x: 80,  y: -50, bg: '#c0c8b0' },
+
+    // ══════════════════════════════════════
+    //  HIDDEN BOTTOM (2 layers)
+    // ══════════════════════════════════════
+    { w: 310, h: 280, x: -2,  y: 110, bg: '#c8c0b0' },
+    { w: 280, h: 270, x: 26,  y: 114, bg: '#d4c8b0' },
+    { w: 300, h: 290, x: 52,  y: 108, bg: '#b8b0a0' },
+    { w: 270, h: 300, x: 78,  y: 112, bg: '#c0b8a8' },
+    { w: 290, h: 310, x: 0,   y: 132, bg: '#c0a8b0' },
+    { w: 320, h: 280, x: 28,  y: 136, bg: '#b8c8b0' },
+    { w: 280, h: 300, x: 54,  y: 130, bg: '#d0b8b0' },
+    { w: 310, h: 270, x: 80,  y: 134, bg: '#c8c0a8' },
+
+    // ══════════════════════════════════════
+    //  HIDDEN CORNERS (layer 1-2)
+    // ══════════════════════════════════════
+    { w: 280, h: 270, x: -30, y: -32, bg: '#c0b8b0' },
+    { w: 300, h: 280, x: 120, y: -30, bg: '#c8d0c8' },
+    { w: 270, h: 300, x: -28, y: 114, bg: '#b8a8b0' },
+    { w: 290, h: 280, x: 122, y: 112, bg: '#c0c8b8' },
+
+    // ══════════════════════════════════════
+    //  HIDDEN LEFT (layer 3)
+    // ══════════════════════════════════════
+    { w: 300, h: 310, x: -66, y: -2,  bg: '#c0b0a0' },
+    { w: 280, h: 290, x: -62, y: 28,  bg: '#b8c0b0' },
+    { w: 310, h: 280, x: -68, y: 56,  bg: '#c8b8a0' },
+    { w: 290, h: 300, x: -64, y: 82,  bg: '#d0c0b0' },
+
+    // ══════════════════════════════════════
+    //  HIDDEN RIGHT (layer 3)
+    // ══════════════════════════════════════
+    { w: 300, h: 290, x: 150, y: -2,  bg: '#b8b0a0' },
+    { w: 280, h: 310, x: 154, y: 28,  bg: '#c0c0b0' },
+    { w: 310, h: 280, x: 148, y: 56,  bg: '#c8b0a8' },
+    { w: 290, h: 300, x: 152, y: 82,  bg: '#d0c8b8' },
+
+    // ══════════════════════════════════════
+    //  HIDDEN TOP (layer 3)
+    // ══════════════════════════════════════
+    { w: 290, h: 280, x: 0,   y: -72, bg: '#c0b8a8' },
+    { w: 310, h: 290, x: 28,  y: -70, bg: '#b8c0a8' },
+    { w: 280, h: 270, x: 54,  y: -74, bg: '#d0c0b8' },
+    { w: 300, h: 300, x: 80,  y: -70, bg: '#c8c8b0' },
+
+    // ══════════════════════════════════════
+    //  HIDDEN BOTTOM (layer 3)
+    // ══════════════════════════════════════
+    { w: 310, h: 290, x: 0,   y: 156, bg: '#b8b8a8' },
+    { w: 280, h: 310, x: 28,  y: 160, bg: '#c0b0b0' },
+    { w: 300, h: 280, x: 54,  y: 154, bg: '#c8c0a0' },
+    { w: 290, h: 300, x: 80,  y: 158, bg: '#d0b8a8' },
+
+    // ══════════════════════════════════════
+    //  HIDDEN CORNERS (layer 3)
+    // ══════════════════════════════════════
+    { w: 300, h: 290, x: -60, y: -68, bg: '#c0c0b8' },
+    { w: 280, h: 280, x: -58, y: 118, bg: '#c8b8b8' },
+    { w: 290, h: 300, x: 148, y: -66, bg: '#b8c0c0' },
+    { w: 310, h: 280, x: 150, y: 116, bg: '#c0b8a0' },
+    { w: 270, h: 270, x: -34, y: -66, bg: '#d0c0c0' },
+    { w: 280, h: 290, x: 124, y: -64, bg: '#b0b8b0' },
+    { w: 300, h: 270, x: -32, y: 138, bg: '#c8c0b8' },
+    { w: 290, h: 280, x: 126, y: 136, bg: '#b8b0a8' },
+  ];
+
+  // Build card elements
+  var cardEls = [];
+  cards.forEach(function(c) {
+    var el = document.createElement('div');
+    el.className = 'p-card';
+    el.style.cssText =
+      'width:' + c.w + 'px;height:' + c.h + 'px;' +
+      'left:calc(' + c.x + 'vw + ' + OFFSET + 'px);' +
+      'top:calc(' + c.y + 'vh + ' + OFFSET + 'px);';
+
+    var angle = (10 + Math.random() * 8) * (Math.random() < 0.5 ? -1 : 1);
+    el.style.setProperty('--tilt', angle.toFixed(1) + 'deg');
+
+    el.addEventListener('click', function() {
+      if (document.body.classList.contains('transitioning')) return;
+      document.body.classList.add('transitioning');
+
+      var rect = el.getBoundingClientRect();
+      var color = face.style.background;
+
+      // Create overlay at the card's exact position
+      var ov = document.createElement('div');
+      ov.className = 'expand-overlay';
+      ov.style.top = rect.top + 'px';
+      ov.style.left = rect.left + 'px';
+      ov.style.width = rect.width + 'px';
+      ov.style.height = rect.height + 'px';
+      ov.style.background = color;
+      document.body.appendChild(ov);
+
+      // Force reflow then expand to fullscreen
+      ov.offsetHeight;
+      ov.classList.add('fullscreen');
+
+      // Navigate after expand completes, passing the color
+      setTimeout(function() {
+        window.location.href = 'home.html?from=cards&color=' + encodeURIComponent(color);
+      }, 580);
+    });
+
+    var face = document.createElement('div');
+    face.className = 'p-card-face';
+    face.style.background = c.bg;
+    el.appendChild(face);
+
+    scene.appendChild(el);
+    cardEls.push(el);
+  });
+
+  // ═══════════════════════════════════════
+  //  INTRO → CARDS TRANSITION
+  // ═══════════════════════════════════════
+  setTimeout(function() {
+    // Remove white overlay — reveals cream bg + cards
+    overlay.classList.add('hide');
+
+    // Drop text z-index so cards go above it
+    kardsText.style.zIndex = '1';
+
+    // Stagger-fade cards in
+    cardEls.forEach(function(el, i) {
+      var delay = 100 + Math.random() * 600;
+      el.style.transition = 'opacity 0.6s ease ' + delay + 'ms, transform 0.6s cubic-bezier(0.34, 1.3, 0.64, 1), box-shadow 0.5s ease';
+      el.classList.add('card-visible');
+    });
+  }, 2000);
+
+  // ═══════════════════════════════════════
+  //  PARALLAX
+  // ═══════════════════════════════════════
+  var targetX = 0, targetY = 0;
+  var currentX = 0, currentY = 0;
+  var prevMX = null, prevMY = null;
+  var SENSITIVITY = 0.35;
+  var LERP = 0.09;
+  var MAX = 1750;
+
+  document.addEventListener('mousemove', function(e) {
+    if (prevMX !== null) {
+      targetX -= (e.clientX - prevMX) * SENSITIVITY;
+      targetY -= (e.clientY - prevMY) * SENSITIVITY;
+      targetX = Math.max(-MAX, Math.min(MAX, targetX));
+      targetY = Math.max(-MAX, Math.min(MAX, targetY));
+    }
+    prevMX = e.clientX;
+    prevMY = e.clientY;
+  });
+
+  var letters = document.querySelectorAll('.pc-letter');
+  var allCards = document.querySelectorAll('.p-card');
+
+  function rectsOverlap(a, b) {
+    return !(a.right < b.left || a.left > b.right || a.bottom < b.top || a.top > b.bottom);
+  }
+
+  function checkOverlap() {
+    for (var l = 0; l < letters.length; l++) {
+      var lr = letters[l].getBoundingClientRect();
+      var hit = false;
+      for (var i = 0; i < allCards.length; i++) {
+        if (rectsOverlap(lr, allCards[i].getBoundingClientRect())) {
+          hit = true;
+          break;
+        }
+      }
+      if (hit) {
+        letters[l].classList.add('obscured');
+      } else {
+        letters[l].classList.remove('obscured');
+      }
+    }
+  }
+
+  function tick() {
+    currentX += (targetX - currentX) * LERP;
+    currentY += (targetY - currentY) * LERP;
+    scene.style.transform = 'translate(' + currentX + 'px,' + currentY + 'px)';
+    checkOverlap();
+    requestAnimationFrame(tick);
+  }
+  tick();
+})();
+</script>
+
+</body>
+</html>

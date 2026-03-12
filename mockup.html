@@ -1,0 +1,1581 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ReviewPost — App Mockup</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@400;700&family=Cairo:wght@400;600;700&family=DM+Sans:wght@400;500;700&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<style>
+/* ═══════════════════════════════════════════ */
+/*  BASE                                       */
+/* ═══════════════════════════════════════════ */
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+:root {
+  --bg: #0a0a0a;
+  --surface: #141414;
+  --surface2: #1c1c1e;
+  --surface3: #2c2c2e;
+  --border: rgba(255,255,255,0.08);
+  --text: #f5f5f7;
+  --text2: #8e8e93;
+  --text3: #636366;
+  --accent: #0a84ff;
+  --accent2: #30d158;
+  --accent-dim: rgba(10,132,255,0.12);
+  --danger: #ff453a;
+  --radius: 14px;
+  --radius-sm: 10px;
+  --radius-xs: 8px;
+}
+html { font-size: 16px; }
+body {
+  background: #111;
+  color: var(--text);
+  font-family: 'Inter', -apple-system, 'SF Pro Display', sans-serif;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  -webkit-font-smoothing: antialiased;
+  overflow: hidden;
+}
+
+/* ═══════════════════════════════════════════ */
+/*  PHONE FRAME                                */
+/* ═══════════════════════════════════════════ */
+.phone {
+  width: 393px;
+  height: 852px;
+  background: var(--bg);
+  border-radius: 44px;
+  overflow: hidden;
+  position: relative;
+  box-shadow:
+    0 0 0 2px #333,
+    0 0 0 4px #1a1a1a,
+    0 40px 80px rgba(0,0,0,0.6);
+  display: flex;
+  flex-direction: column;
+}
+
+/* Dynamic Island */
+.phone::before {
+  content: '';
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 126px;
+  height: 36px;
+  background: #000;
+  border-radius: 20px;
+  z-index: 100;
+}
+
+/* Status bar */
+.status-bar {
+  height: 59px;
+  padding: 14px 30px 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 15px;
+  font-weight: 600;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 50;
+}
+.status-bar .time { margin-left: 4px; }
+.status-bar .icons { display: flex; gap: 6px; align-items: center; }
+.status-bar .icons svg { width: 16px; height: 16px; }
+
+/* Home indicator */
+.home-indicator {
+  height: 34px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding-bottom: 8px;
+  flex-shrink: 0;
+}
+.home-indicator div {
+  width: 134px;
+  height: 5px;
+  background: rgba(255,255,255,0.3);
+  border-radius: 3px;
+}
+
+/* ═══════════════════════════════════════════ */
+/*  SCREEN MANAGEMENT                          */
+/* ═══════════════════════════════════════════ */
+.screen {
+  display: none;
+  flex-direction: column;
+  flex: 1;
+  overflow: hidden;
+}
+.screen.active { display: flex; }
+
+/* Slide transitions */
+.screen {
+  animation: screenIn 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+@keyframes screenIn {
+  from { opacity: 0; transform: translateX(30px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+/* ═══════════════════════════════════════════ */
+/*  SHARED COMPONENTS                          */
+/* ═══════════════════════════════════════════ */
+.nav-bar {
+  padding: 0 20px 12px;
+  flex-shrink: 0;
+}
+.nav-bar h1 {
+  font-size: 32px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+}
+.nav-bar-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.nav-back {
+  background: none;
+  color: var(--accent);
+  font-size: 17px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 0;
+}
+.nav-back svg { width: 20px; height: 20px; }
+.nav-title {
+  font-size: 17px;
+  font-weight: 600;
+  text-align: center;
+}
+.nav-action {
+  background: none;
+  color: var(--accent);
+  font-size: 17px;
+  font-weight: 500;
+  padding: 8px 0;
+}
+
+.scroll-area {
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+.scroll-area::-webkit-scrollbar { display: none; }
+
+.section-header {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text2);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 20px 20px 8px;
+}
+
+.card-group {
+  margin: 0 20px;
+  background: var(--surface);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.card-row {
+  display: flex;
+  align-items: center;
+  padding: 13px 16px;
+  gap: 12px;
+  position: relative;
+}
+.card-row:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 52px;
+  right: 0;
+  height: 0.5px;
+  background: var(--border);
+}
+.card-row .row-icon {
+  width: 30px;
+  height: 30px;
+  border-radius: 7px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: 15px;
+}
+.card-row .row-label {
+  flex: 1;
+  font-size: 16px;
+}
+.card-row .row-value {
+  font-size: 16px;
+  color: var(--text2);
+}
+.card-row .row-chevron {
+  color: var(--text3);
+  font-size: 14px;
+}
+.card-row input[type="text"] {
+  flex: 1;
+  background: none;
+  border: none;
+  color: var(--text);
+  font-size: 16px;
+  outline: none;
+  text-align: right;
+  font-family: inherit;
+}
+.card-row input[type="text"]::placeholder { color: var(--text3); }
+.card-row input[type="color"] {
+  width: 28px;
+  height: 28px;
+  border: 2px solid var(--border);
+  border-radius: 50%;
+  background: none;
+  cursor: pointer;
+  padding: 0;
+}
+.card-row input[type="color"]::-webkit-color-swatch-wrapper { padding: 1px; }
+.card-row input[type="color"]::-webkit-color-swatch { border-radius: 50%; border: none; }
+
+.btn-primary {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 20px 20px;
+  padding: 16px;
+  background: var(--accent);
+  color: #fff;
+  font-size: 17px;
+  font-weight: 600;
+  border-radius: var(--radius);
+  transition: opacity 0.15s, transform 0.1s;
+  gap: 8px;
+}
+.btn-primary:active { transform: scale(0.97); opacity: 0.85; }
+
+/* ═══════════════════════════════════════════ */
+/*  SCREEN 1: ONBOARDING                      */
+/* ═══════════════════════════════════════════ */
+#onboardScreen {
+  justify-content: center;
+  align-items: center;
+  padding: 40px 32px;
+  text-align: center;
+  gap: 0;
+}
+.onboard-icon {
+  width: 80px;
+  height: 80px;
+  background: linear-gradient(135deg, var(--accent), #5856d6);
+  border-radius: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 40px;
+  margin-bottom: 24px;
+  box-shadow: 0 12px 40px rgba(10,132,255,0.3);
+}
+.onboard-title {
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  margin-bottom: 8px;
+}
+.onboard-sub {
+  font-size: 16px;
+  color: var(--text2);
+  line-height: 1.5;
+  margin-bottom: 40px;
+}
+.onboard-input-group {
+  width: 100%;
+  text-align: left;
+  margin-bottom: 16px;
+}
+.onboard-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text2);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+  display: block;
+}
+.onboard-input {
+  width: 100%;
+  padding: 14px 16px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  font-size: 17px;
+  outline: none;
+  font-family: inherit;
+  transition: border-color 0.2s;
+}
+.onboard-input:focus { border-color: var(--accent); }
+
+.logo-upload {
+  width: 100%;
+  height: 80px;
+  border: 2px dashed rgba(255,255,255,0.12);
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  color: var(--text2);
+  font-size: 15px;
+  position: relative;
+  transition: border-color 0.2s;
+  overflow: hidden;
+  cursor: pointer;
+}
+.logo-upload:hover { border-color: var(--accent); }
+.logo-upload input { position: absolute; inset:0; opacity:0; cursor:pointer; }
+.logo-upload img { max-height: 56px; max-width: 180px; object-fit: contain; }
+.logo-upload svg { width: 22px; height: 22px; opacity: 0.5; }
+
+.color-picks {
+  width: 100%;
+  display: flex;
+  gap: 12px;
+}
+.color-pick {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+}
+.color-pick input[type="color"] {
+  width: 32px;
+  height: 32px;
+  border: 2px solid rgba(255,255,255,0.12);
+  border-radius: 50%;
+  background: none;
+  cursor: pointer;
+  padding: 0;
+  flex-shrink: 0;
+}
+.color-pick input[type="color"]::-webkit-color-swatch-wrapper { padding: 1px; }
+.color-pick input[type="color"]::-webkit-color-swatch { border-radius: 50%; border: none; }
+.color-pick span { font-size: 13px; color: var(--text2); }
+
+.onboard-btn {
+  width: 100%;
+  padding: 16px;
+  background: var(--accent);
+  color: #fff;
+  font-size: 17px;
+  font-weight: 600;
+  border-radius: var(--radius);
+  margin-top: 28px;
+  transition: opacity 0.15s, transform 0.1s;
+}
+.onboard-btn:active { transform: scale(0.97); opacity: 0.85; }
+
+/* ═══════════════════════════════════════════ */
+/*  SCREEN 2: REVIEWS LIST                     */
+/* ═══════════════════════════════════════════ */
+.review-card {
+  margin: 0 20px 12px;
+  background: var(--surface);
+  border-radius: var(--radius);
+  padding: 16px;
+  transition: transform 0.15s, background 0.15s;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+.review-card:active {
+  transform: scale(0.97);
+  background: var(--surface2);
+}
+.review-card .rc-stars {
+  color: #ffcc00;
+  font-size: 14px;
+  letter-spacing: 2px;
+  margin-bottom: 8px;
+}
+.review-card .rc-text {
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--text);
+  margin-bottom: 10px;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.review-card .rc-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.review-card .rc-name {
+  font-size: 13px;
+  color: var(--text2);
+  font-weight: 500;
+}
+.review-card .rc-source {
+  font-size: 12px;
+  color: var(--text3);
+}
+.review-card .rc-arrow {
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text3);
+  font-size: 18px;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+.review-card:hover .rc-arrow { opacity: 1; }
+
+/* Add review floating button */
+.fab {
+  position: absolute;
+  bottom: 24px;
+  right: 20px;
+  width: 56px;
+  height: 56px;
+  background: var(--accent);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 32px rgba(10,132,255,0.4);
+  transition: transform 0.15s;
+  z-index: 10;
+}
+.fab:active { transform: scale(0.9); }
+.fab svg { width: 24px; height: 24px; color: #fff; }
+
+/* Add review bottom sheet */
+.sheet-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 20;
+  display: none;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+.sheet-overlay.visible { display: block; opacity: 1; }
+.sheet {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--surface);
+  border-radius: 16px 16px 0 0;
+  padding: 12px 20px 34px;
+  z-index: 21;
+  transform: translateY(100%);
+  transition: transform 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+.sheet.visible { transform: translateY(0); }
+.sheet-handle {
+  width: 36px;
+  height: 5px;
+  background: rgba(255,255,255,0.2);
+  border-radius: 3px;
+  margin: 0 auto 16px;
+}
+.sheet h3 {
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 16px;
+}
+.sheet-input {
+  width: 100%;
+  padding: 13px 16px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  font-size: 16px;
+  outline: none;
+  font-family: inherit;
+  margin-bottom: 12px;
+  transition: border-color 0.2s;
+}
+.sheet-input:focus { border-color: var(--accent); }
+textarea.sheet-input { min-height: 80px; resize: none; }
+.sheet-row {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+.sheet-row select {
+  padding: 13px 14px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  font-size: 16px;
+  outline: none;
+  font-family: inherit;
+}
+.sheet-btn {
+  width: 100%;
+  padding: 15px;
+  background: var(--accent);
+  color: #fff;
+  font-size: 17px;
+  font-weight: 600;
+  border-radius: var(--radius-sm);
+  margin-top: 4px;
+  transition: transform 0.1s;
+}
+.sheet-btn:active { transform: scale(0.97); }
+
+/* ═══════════════════════════════════════════ */
+/*  SCREEN 3: EDITOR                           */
+/* ═══════════════════════════════════════════ */
+#editorScreen {
+  overflow: hidden;
+}
+
+/* Editor top bar */
+.editor-top {
+  padding: 0 16px 8px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+}
+.editor-top .nav-back { font-size: 16px; }
+
+.btn-download {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  background: var(--accent);
+  color: #fff;
+  font-size: 15px;
+  font-weight: 600;
+  border-radius: 100px;
+  transition: transform 0.1s;
+}
+.btn-download:active { transform: scale(0.95); }
+.btn-download svg { width: 16px; height: 16px; }
+
+/* Preview area */
+.editor-canvas {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 20px;
+  overflow: hidden;
+  min-height: 0;
+}
+.preview-wrap {
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 16px 48px rgba(0,0,0,0.5);
+  position: relative;
+}
+
+/* Graphic */
+.graphic {
+  width: 320px;
+  height: 320px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 44px;
+  overflow: hidden;
+  text-align: center;
+  transition: width 0.35s ease, height 0.35s ease;
+}
+.graphic.story {
+  width: 240px;
+  height: 426px;
+}
+.graphic .g-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  transition: background 0.5s ease;
+}
+.graphic .g-border {
+  position: absolute;
+  z-index: 1;
+  pointer-events: none;
+  transition: border-color 0.5s ease, opacity 0.3s ease;
+}
+.graphic .g-content {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+}
+.graphic .g-stars {
+  letter-spacing: 5px;
+  transition: color 0.4s ease;
+  margin-bottom: 14px;
+}
+.graphic .g-quote {
+  margin-bottom: 16px;
+  word-wrap: break-word;
+  transition: color 0.4s ease;
+}
+.graphic .g-reviewer {
+  margin-bottom: 3px;
+  transition: color 0.4s ease;
+}
+.graphic .g-source {
+  opacity: 0.5;
+  transition: color 0.4s ease;
+}
+.graphic .g-logo {
+  position: absolute;
+  z-index: 3;
+  object-fit: contain;
+}
+.graphic .g-brand {
+  position: absolute;
+  z-index: 3;
+  transition: color 0.4s ease;
+}
+
+/* ═══════════════════════════════════════════ */
+/*  EDITOR BOTTOM PANEL (tabs + controls)      */
+/* ═══════════════════════════════════════════ */
+.editor-bottom {
+  flex-shrink: 0;
+  background: var(--surface);
+  border-top: 0.5px solid var(--border);
+  border-radius: 20px 20px 0 0;
+  display: flex;
+  flex-direction: column;
+  max-height: 320px;
+}
+
+/* Tab bar */
+.tab-bar {
+  display: flex;
+  padding: 10px 12px 0;
+  gap: 2px;
+  flex-shrink: 0;
+  overflow-x: auto;
+}
+.tab-bar::-webkit-scrollbar { display: none; }
+.tab-btn {
+  padding: 8px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text2);
+  background: none;
+  border-radius: 100px;
+  white-space: nowrap;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+.tab-btn.active {
+  background: var(--accent-dim);
+  color: var(--accent);
+}
+
+/* Tab content */
+.tab-panels {
+  flex: 1;
+  overflow-y: auto;
+  padding: 12px 16px 16px;
+}
+.tab-panels::-webkit-scrollbar { display: none; }
+.tab-panel { display: none; }
+.tab-panel.active { display: block; }
+
+/* Controls inside tabs */
+.ctrl {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+.ctrl-label {
+  font-size: 14px;
+  color: var(--text2);
+  min-width: 64px;
+  flex-shrink: 0;
+}
+.ctrl input[type="range"] {
+  flex: 1;
+  accent-color: var(--accent);
+  height: 4px;
+}
+.ctrl input[type="color"] {
+  width: 30px;
+  height: 30px;
+  border: 2px solid var(--border);
+  border-radius: 50%;
+  background: none;
+  cursor: pointer;
+  padding: 0;
+  flex-shrink: 0;
+}
+.ctrl input[type="color"]::-webkit-color-swatch-wrapper { padding: 1px; }
+.ctrl input[type="color"]::-webkit-color-swatch { border-radius: 50%; border: none; }
+.ctrl select {
+  flex: 1;
+  padding: 9px 12px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xs);
+  color: var(--text);
+  font-size: 14px;
+  outline: none;
+  font-family: inherit;
+}
+.ctrl .val {
+  font-size: 12px;
+  color: var(--text3);
+  min-width: 30px;
+  text-align: right;
+}
+
+/* Toggle pill group */
+.pill-group {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 14px;
+}
+.pill-btn {
+  flex: 1;
+  padding: 9px 8px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  color: var(--text2);
+  font-size: 13px;
+  font-weight: 600;
+  border-radius: 100px;
+  transition: all 0.2s;
+  text-align: center;
+}
+.pill-btn.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+
+/* Template grid in tab */
+.tmpl-grid {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+}
+.tmpl-grid::-webkit-scrollbar { display: none; }
+.tmpl-thumb {
+  width: 52px;
+  height: 52px;
+  border-radius: var(--radius-sm);
+  border: 2.5px solid transparent;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: transform 0.15s, border-color 0.2s;
+}
+.tmpl-thumb:active { transform: scale(0.92); }
+.tmpl-thumb.active { border-color: var(--accent); }
+
+/* Preset swatches */
+.presets {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 10px;
+}
+.preset-swatch {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-xs);
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: transform 0.1s, border-color 0.2s;
+}
+.preset-swatch:active { transform: scale(0.9); }
+.preset-swatch.active { border-color: var(--accent); }
+
+/* Format toggle */
+.format-pills {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+/* On/off toggle switch */
+.toggle-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+.toggle-label { font-size: 14px; color: var(--text2); }
+.toggle {
+  width: 51px;
+  height: 31px;
+  background: var(--surface3);
+  border-radius: 100px;
+  position: relative;
+  cursor: pointer;
+  transition: background 0.25s;
+  border: none;
+  flex-shrink: 0;
+}
+.toggle.on { background: var(--accent2); }
+.toggle::after {
+  content: '';
+  position: absolute;
+  width: 27px;
+  height: 27px;
+  background: #fff;
+  border-radius: 50%;
+  top: 2px;
+  left: 2px;
+  transition: transform 0.25s;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+.toggle.on::after { transform: translateX(20px); }
+</style>
+</head>
+<body>
+
+<div class="phone">
+  <!-- Status Bar -->
+  <div class="status-bar">
+    <span class="time">9:41</span>
+    <span class="icons">
+      <svg viewBox="0 0 16 16" fill="currentColor"><path d="M1 12h2v3H1zM5 9h2v6H5zM9 6h2v9H9zM13 2h2v13h-2z"/></svg>
+      <svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 2C4.7 2 2 4 2 4l1.3 1.5S5.5 4 8 4s4.7 1.5 4.7 1.5L14 4s-2.7-2-6-2zm0 4C6 6 4.5 7 4.5 7L5.8 8.5S6.8 8 8 8s2.2.5 2.2.5L11.5 7S10 6 8 6zm0 4c-.8 0-1.5.4-1.5.4L8 12l1.5-1.6S9 10 8 10z"/></svg>
+      <svg viewBox="0 0 24 16" fill="currentColor"><rect x="0" y="2" width="20" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="1.5"/><rect x="21" y="5.5" width="2" height="5" rx="1"/><rect x="2" y="4" width="14" height="8" rx="1"/></svg>
+    </span>
+  </div>
+
+  <!-- Screen 1: Onboarding -->
+  <div id="onboardScreen" class="screen active">
+    <div class="onboard-icon">★</div>
+    <div class="onboard-title">ReviewPost</div>
+    <div class="onboard-sub">Turn your best reviews into stunning social media posts</div>
+
+    <div class="onboard-input-group">
+      <label class="onboard-label">Business Name</label>
+      <input class="onboard-input" type="text" id="bizName" placeholder="e.g. Burger Boutique">
+    </div>
+
+    <div class="onboard-input-group">
+      <label class="onboard-label">Logo (optional)</label>
+      <div class="logo-upload" id="logoArea">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 16V6m0 0l-4 4m4-4l4 4M4 18h16"/></svg>
+        <span id="logoLabel">Upload logo</span>
+        <img id="logoPrev" style="display:none">
+        <input type="file" accept="image/*" id="logoFile">
+      </div>
+    </div>
+
+    <div class="onboard-input-group">
+      <label class="onboard-label">Brand Colors</label>
+      <div class="color-picks">
+        <div class="color-pick">
+          <input type="color" id="bColor1" value="#6366f1">
+          <span>Primary</span>
+        </div>
+        <div class="color-pick">
+          <input type="color" id="bColor2" value="#1a1a2e">
+          <span>Dark</span>
+        </div>
+      </div>
+    </div>
+
+    <button class="onboard-btn" onclick="goReviews()">Get Started</button>
+  </div>
+
+  <!-- Screen 2: Reviews -->
+  <div id="reviewsScreen" class="screen">
+    <div class="nav-bar">
+      <div class="nav-bar-row">
+        <h1>Reviews</h1>
+        <button class="nav-action" onclick="goOnboard()" style="font-size:15px;">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 01-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+        </button>
+      </div>
+    </div>
+    <div class="scroll-area" style="position:relative;">
+      <p class="section-header">TAP A REVIEW TO DESIGN</p>
+      <div id="reviewList"></div>
+      <div style="height:80px"></div>
+
+      <!-- FAB -->
+      <button class="fab" onclick="openSheet()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+      </button>
+    </div>
+
+    <!-- Add Review Sheet -->
+    <div class="sheet-overlay" id="sheetOverlay" onclick="closeSheet()"></div>
+    <div class="sheet" id="addSheet">
+      <div class="sheet-handle"></div>
+      <h3>Add Review</h3>
+      <div class="sheet-row">
+        <input class="sheet-input" type="text" id="newName" placeholder="Reviewer name" style="margin-bottom:0">
+        <select class="sheet-input" id="newStars" style="margin-bottom:0;width:100px;flex:0 0 auto;">
+          <option value="5">5 ★</option>
+          <option value="4">4 ★</option>
+          <option value="3">3 ★</option>
+        </select>
+      </div>
+      <textarea class="sheet-input" id="newText" placeholder="Paste the review text..."></textarea>
+      <button class="sheet-btn" onclick="addReview()">Add Review</button>
+    </div>
+  </div>
+
+  <!-- Screen 3: Editor -->
+  <div id="editorScreen" class="screen">
+    <div class="editor-top">
+      <button class="nav-back" onclick="goReviews()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>
+        Reviews
+      </button>
+      <button class="btn-download" onclick="exportPNG()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+        Save
+      </button>
+    </div>
+
+    <!-- Canvas -->
+    <div class="editor-canvas">
+      <div class="preview-wrap">
+        <div class="graphic" id="graphic">
+          <div class="g-bg" id="gBg"></div>
+          <div class="g-border" id="gBorder"></div>
+          <div class="g-content" id="gContent">
+            <div class="g-stars" id="gStars"></div>
+            <div class="g-quote" id="gQuote"></div>
+            <div class="g-reviewer" id="gReviewer"></div>
+            <div class="g-source" id="gSource"></div>
+          </div>
+          <img class="g-logo" id="gLogo" style="display:none">
+          <div class="g-brand" id="gBrand"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom Panel -->
+    <div class="editor-bottom">
+      <div class="tab-bar">
+        <button class="tab-btn active" data-tab="templates" onclick="switchTab(this)">Style</button>
+        <button class="tab-btn" data-tab="background" onclick="switchTab(this)">Background</button>
+        <button class="tab-btn" data-tab="text" onclick="switchTab(this)">Text</button>
+        <button class="tab-btn" data-tab="details" onclick="switchTab(this)">Details</button>
+        <button class="tab-btn" data-tab="format" onclick="switchTab(this)">Format</button>
+      </div>
+
+      <div class="tab-panels">
+        <!-- TAB: Templates -->
+        <div class="tab-panel active" data-panel="templates">
+          <div class="tmpl-grid" id="tmplGrid"></div>
+        </div>
+
+        <!-- TAB: Background -->
+        <div class="tab-panel" data-panel="background">
+          <div class="pill-group">
+            <button class="pill-btn active" onclick="setBgType('solid',this)">Solid</button>
+            <button class="pill-btn" onclick="setBgType('gradient',this)">Gradient</button>
+          </div>
+          <div class="ctrl">
+            <span class="ctrl-label">Color 1</span>
+            <input type="color" id="bgColor1" value="#0f0f0f" onchange="updatePreview()">
+            <input type="range" id="bgAngle" min="0" max="360" value="145" oninput="updatePreview(); document.getElementById('bgAngleVal').textContent=this.value+'°'" style="display:none">
+            <span class="val" id="bgAngleVal" style="display:none">145°</span>
+          </div>
+          <div class="ctrl" id="bgC2Row" style="display:none">
+            <span class="ctrl-label">Color 2</span>
+            <input type="color" id="bgColor2" value="#1a1a2e" onchange="updatePreview()">
+          </div>
+          <div class="presets" id="bgPresets"></div>
+        </div>
+
+        <!-- TAB: Text -->
+        <div class="tab-panel" data-panel="text">
+          <div class="ctrl">
+            <span class="ctrl-label">Font</span>
+            <select id="fontFamily" onchange="updatePreview()">
+              <option value="'Inter', sans-serif">Inter</option>
+              <option value="'Playfair Display', serif">Playfair Display</option>
+              <option value="'DM Sans', sans-serif">DM Sans</option>
+              <option value="'Space Grotesk', sans-serif">Space Grotesk</option>
+              <option value="'Cairo', sans-serif">Cairo (Arabic)</option>
+            </select>
+          </div>
+          <div class="ctrl">
+            <span class="ctrl-label">Size</span>
+            <input type="range" id="fontSize" min="12" max="28" value="16" oninput="updatePreview(); document.getElementById('fsVal').textContent=this.value+'px'">
+            <span class="val" id="fsVal">16px</span>
+          </div>
+          <div class="ctrl">
+            <span class="ctrl-label">Color</span>
+            <input type="color" id="textColor" value="#ffffff" onchange="updatePreview()">
+          </div>
+          <div class="pill-group">
+            <button class="pill-btn" onclick="setAlign('left',this)">Left</button>
+            <button class="pill-btn active" onclick="setAlign('center',this)">Center</button>
+            <button class="pill-btn" onclick="setAlign('right',this)">Right</button>
+          </div>
+        </div>
+
+        <!-- TAB: Details (stars, reviewer, border, brand) -->
+        <div class="tab-panel" data-panel="details">
+          <div class="toggle-wrap">
+            <span class="toggle-label">Stars</span>
+            <button class="toggle on" id="togStars" onclick="toggleBtn(this); updatePreview()"></button>
+          </div>
+          <div class="ctrl">
+            <span class="ctrl-label">Star Color</span>
+            <input type="color" id="starColor" value="#fbbf24" onchange="updatePreview()">
+          </div>
+          <div style="height:8px"></div>
+          <div class="toggle-wrap">
+            <span class="toggle-label">Reviewer Name</span>
+            <button class="toggle on" id="togReviewer" onclick="toggleBtn(this); updatePreview()"></button>
+          </div>
+          <div class="ctrl">
+            <span class="ctrl-label">Name Color</span>
+            <input type="color" id="reviewerColor" value="#999999" onchange="updatePreview()">
+          </div>
+          <div style="height:8px"></div>
+          <div class="toggle-wrap">
+            <span class="toggle-label">Border Frame</span>
+            <button class="toggle" id="togBorder" onclick="toggleBtn(this); updatePreview()"></button>
+          </div>
+          <div class="ctrl">
+            <span class="ctrl-label">Border Color</span>
+            <input type="color" id="borderColor" value="#d4af37" onchange="updatePreview()">
+          </div>
+          <div style="height:8px"></div>
+          <div class="toggle-wrap">
+            <span class="toggle-label">Brand Name</span>
+            <button class="toggle on" id="togBrand" onclick="toggleBtn(this); updatePreview()"></button>
+          </div>
+          <div class="ctrl">
+            <span class="ctrl-label">Brand Color</span>
+            <input type="color" id="brandColor" value="#d4af37" onchange="updatePreview()">
+          </div>
+        </div>
+
+        <!-- TAB: Format -->
+        <div class="tab-panel" data-panel="format">
+          <div class="pill-group format-pills">
+            <button class="pill-btn active" onclick="setFormat('feed',this)">1:1 Feed</button>
+            <button class="pill-btn" onclick="setFormat('story',this)">9:16 Story</button>
+          </div>
+          <div class="ctrl">
+            <span class="ctrl-label">Padding</span>
+            <input type="range" id="padding" min="20" max="80" value="44" oninput="updatePreview(); document.getElementById('padVal').textContent=this.value+'px'">
+            <span class="val" id="padVal">44px</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Home Indicator -->
+  <div class="home-indicator"><div></div></div>
+</div>
+
+<script>
+/* ═══════════════════════════════════════════ */
+/*  STATE                                      */
+/* ═══════════════════════════════════════════ */
+let state = {
+  bizName: '',
+  logoData: null,
+  brandColor1: '#6366f1',
+  brandColor2: '#1a1a2e',
+  reviews: [],
+  current: null,
+  format: 'feed',
+  bgType: 'solid',
+  textAlign: 'center',
+};
+
+const DEMO_REVIEWS = [
+  { stars: 5, text: "Best burger I've ever had in Kuwait. The smash patty was perfect and the staff were incredibly friendly.", name: "Ahmed Al-Sabah", source: "Google Review" },
+  { stars: 5, text: "We come here every Friday as a family. The food is exactly like my grandmother's cooking. Absolutely incredible.", name: "Fatima K.", source: "Google Review" },
+  { stars: 5, text: "The attention to detail is unmatched. Every single visit is consistently amazing. My go-to spot.", name: "Mohammad R.", source: "Google Review" },
+  { stars: 5, text: "اطيب اكل بالكويت بدون منازع. الطعم يذكرني بطبخ يدتي الله يرحمها. انصح الكل يجربه", name: "عبدالله العنزي", source: "Google Review" },
+  { stars: 4, text: "Great food and atmosphere. The only reason it's not 5 stars is the wait time on weekends. Otherwise, perfection.", name: "Sara M.", source: "Google Review" },
+];
+
+/* ═══════════════════════════════════════════ */
+/*  TEMPLATES                                  */
+/* ═══════════════════════════════════════════ */
+const TEMPLATES = [
+  {
+    name: 'Elegant Dark',
+    thumb: 'linear-gradient(145deg, #0f0f0f, #1a1a1a)',
+    bgType: 'gradient', bgColor1: '#0f0f0f', bgColor2: '#1a1a2e', bgAngle: 145,
+    fontFamily: "'Playfair Display', serif", fontSize: 16, textColor: '#ffffff', textAlign: 'center',
+    starColor: '#d4af37', starShow: true, reviewerColor: '#999999', reviewerShow: true,
+    borderShow: true, borderColor: '#d4af37', borderInset: 12,
+    brandColor: '#d4af37', brandShow: true, padding: 44,
+  },
+  {
+    name: 'Clean White',
+    thumb: 'linear-gradient(180deg, #ffffff, #f0f0f0)',
+    bgType: 'solid', bgColor1: '#ffffff', bgColor2: '#ffffff', bgAngle: 180,
+    fontFamily: "'Inter', sans-serif", fontSize: 15, textColor: '#222222', textAlign: 'left',
+    starColor: '#e74c3c', starShow: true, reviewerColor: '#333333', reviewerShow: true,
+    borderShow: false, borderColor: '#e74c3c', borderInset: 12,
+    brandColor: '#222222', brandShow: true, padding: 40,
+  },
+  {
+    name: 'Gradient Pop',
+    thumb: 'linear-gradient(135deg, #667eea, #764ba2)',
+    bgType: 'gradient', bgColor1: '#667eea', bgColor2: '#764ba2', bgAngle: 135,
+    fontFamily: "'Inter', sans-serif", fontSize: 15, textColor: '#ffffff', textAlign: 'center',
+    starColor: '#ffd700', starShow: true, reviewerColor: '#e0d0ff', reviewerShow: true,
+    borderShow: false, borderColor: '#ffffff', borderInset: 12,
+    brandColor: '#ffffff', brandShow: true, padding: 40,
+  },
+  {
+    name: 'Arabic Green',
+    thumb: 'linear-gradient(145deg, #1b4332, #2d6a4f)',
+    bgType: 'gradient', bgColor1: '#1b4332', bgColor2: '#2d6a4f', bgAngle: 145,
+    fontFamily: "'Cairo', sans-serif", fontSize: 17, textColor: '#ffffff', textAlign: 'center',
+    starColor: '#ffd700', starShow: true, reviewerColor: '#b0cfb0', reviewerShow: true,
+    borderShow: true, borderColor: '#ffd70040', borderInset: 10,
+    brandColor: '#ffd700', brandShow: true, padding: 38,
+  },
+  {
+    name: 'Warm Sunset',
+    thumb: 'linear-gradient(135deg, #ff6b6b, #f0932b)',
+    bgType: 'gradient', bgColor1: '#ff6b6b', bgColor2: '#f0932b', bgAngle: 135,
+    fontFamily: "'DM Sans', sans-serif", fontSize: 15, textColor: '#ffffff', textAlign: 'center',
+    starColor: '#ffffff', starShow: true, reviewerColor: '#ffffffcc', reviewerShow: true,
+    borderShow: false, borderColor: '#ffffff', borderInset: 12,
+    brandColor: '#ffffff', brandShow: true, padding: 40,
+  },
+  {
+    name: 'Midnight Blue',
+    thumb: 'linear-gradient(145deg, #0c1445, #1a237e)',
+    bgType: 'gradient', bgColor1: '#0c1445', bgColor2: '#1a237e', bgAngle: 145,
+    fontFamily: "'Space Grotesk', sans-serif", fontSize: 15, textColor: '#e0e0ff', textAlign: 'center',
+    starColor: '#7c83ff', starShow: true, reviewerColor: '#8888cc', reviewerShow: true,
+    borderShow: false, borderColor: '#5555aa', borderInset: 12,
+    brandColor: '#7c83ff', brandShow: true, padding: 44,
+  },
+];
+
+const BG_PRESETS = [
+  { c1: '#0f0f0f', c2: '#1a1a2e', type: 'gradient' },
+  { c1: '#ffffff', c2: '#ffffff', type: 'solid' },
+  { c1: '#667eea', c2: '#764ba2', type: 'gradient' },
+  { c1: '#1b4332', c2: '#2d6a4f', type: 'gradient' },
+  { c1: '#ff6b6b', c2: '#f0932b', type: 'gradient' },
+  { c1: '#0c1445', c2: '#1a237e', type: 'gradient' },
+  { c1: '#1a1a1a', c2: '#1a1a1a', type: 'solid' },
+  { c1: '#f5f0eb', c2: '#f5f0eb', type: 'solid' },
+];
+
+/* ═══════════════════════════════════════════ */
+/*  NAVIGATION                                 */
+/* ═══════════════════════════════════════════ */
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+function goOnboard() { showScreen('onboardScreen'); }
+function goReviews() {
+  renderReviews();
+  showScreen('reviewsScreen');
+}
+function goEditor(review) {
+  state.current = review;
+  applyTemplate(0);
+  showScreen('editorScreen');
+}
+
+/* ═══════════════════════════════════════════ */
+/*  ONBOARDING                                 */
+/* ═══════════════════════════════════════════ */
+document.getElementById('logoFile').addEventListener('change', function(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(ev) {
+    state.logoData = ev.target.result;
+    const prev = document.getElementById('logoPrev');
+    prev.src = state.logoData;
+    prev.style.display = 'block';
+    document.getElementById('logoLabel').style.display = 'none';
+    document.querySelector('.logo-upload svg').style.display = 'none';
+  };
+  reader.readAsDataURL(file);
+});
+
+function goReviews() {
+  state.bizName = document.getElementById('bizName').value || 'My Business';
+  state.brandColor1 = document.getElementById('bColor1').value;
+  state.brandColor2 = document.getElementById('bColor2').value;
+  if (state.reviews.length === 0) {
+    state.reviews = [...DEMO_REVIEWS];
+  }
+  renderReviews();
+  showScreen('reviewsScreen');
+}
+
+/* ═══════════════════════════════════════════ */
+/*  REVIEWS LIST                               */
+/* ═══════════════════════════════════════════ */
+function renderReviews() {
+  const el = document.getElementById('reviewList');
+  el.innerHTML = state.reviews.map((r, i) => `
+    <div class="review-card" onclick="goEditor(state.reviews[${i}])">
+      <div class="rc-stars">${'★'.repeat(r.stars)}${'☆'.repeat(5-r.stars)}</div>
+      <div class="rc-text">${escapeHtml(r.text)}</div>
+      <div class="rc-footer">
+        <span class="rc-name">${escapeHtml(r.name)}</span>
+        <span class="rc-source">${escapeHtml(r.source)}</span>
+      </div>
+      <span class="rc-arrow">›</span>
+    </div>
+  `).join('');
+}
+
+/* Sheet */
+function openSheet() {
+  document.getElementById('sheetOverlay').classList.add('visible');
+  setTimeout(() => document.getElementById('addSheet').classList.add('visible'), 10);
+}
+function closeSheet() {
+  document.getElementById('addSheet').classList.remove('visible');
+  setTimeout(() => document.getElementById('sheetOverlay').classList.remove('visible'), 350);
+}
+function addReview() {
+  const name = document.getElementById('newName').value.trim();
+  const text = document.getElementById('newText').value.trim();
+  const stars = parseInt(document.getElementById('newStars').value);
+  if (!text) return;
+  state.reviews.unshift({ stars, text, name: name || 'Anonymous', source: 'Google Review' });
+  document.getElementById('newName').value = '';
+  document.getElementById('newText').value = '';
+  closeSheet();
+  renderReviews();
+}
+
+/* ═══════════════════════════════════════════ */
+/*  EDITOR                                     */
+/* ═══════════════════════════════════════════ */
+
+/* Tabs */
+function switchTab(btn) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelector(`.tab-panel[data-panel="${btn.dataset.tab}"]`).classList.add('active');
+}
+
+/* Toggle button */
+function toggleBtn(el) {
+  el.classList.toggle('on');
+}
+
+/* Templates */
+function initTemplates() {
+  const grid = document.getElementById('tmplGrid');
+  grid.innerHTML = TEMPLATES.map((t, i) => `
+    <div class="tmpl-thumb ${i===0?'active':''}" style="background:${t.thumb}" onclick="applyTemplate(${i})"></div>
+  `).join('');
+}
+
+function applyTemplate(idx) {
+  const t = TEMPLATES[idx];
+  // Update controls
+  document.getElementById('bgColor1').value = t.bgColor1;
+  document.getElementById('bgColor2').value = t.bgColor2;
+  document.getElementById('bgAngle').value = t.bgAngle || 145;
+  document.getElementById('fontFamily').value = t.fontFamily;
+  document.getElementById('fontSize').value = t.fontSize;
+  document.getElementById('fsVal').textContent = t.fontSize + 'px';
+  document.getElementById('textColor').value = t.textColor;
+  document.getElementById('starColor').value = t.starColor;
+  document.getElementById('reviewerColor').value = t.reviewerColor;
+  document.getElementById('borderColor').value = t.borderColor;
+  document.getElementById('brandColor').value = t.brandColor;
+  document.getElementById('padding').value = t.padding;
+  document.getElementById('padVal').textContent = t.padding + 'px';
+
+  // Toggles
+  setToggle('togStars', t.starShow);
+  setToggle('togReviewer', t.reviewerShow);
+  setToggle('togBorder', t.borderShow);
+  setToggle('togBrand', t.brandShow);
+
+  // Bg type
+  state.bgType = t.bgType;
+  const bgPills = document.querySelectorAll('.tab-panel[data-panel="background"] .pill-btn');
+  bgPills.forEach(b => b.classList.remove('active'));
+  if (t.bgType === 'solid') bgPills[0].classList.add('active');
+  else bgPills[1].classList.add('active');
+  document.getElementById('bgC2Row').style.display = t.bgType === 'gradient' ? 'flex' : 'none';
+  document.getElementById('bgAngle').style.display = t.bgType === 'gradient' ? '' : 'none';
+  document.getElementById('bgAngleVal').style.display = t.bgType === 'gradient' ? '' : 'none';
+
+  // Text align
+  state.textAlign = t.textAlign;
+  const alignPills = document.querySelectorAll('.tab-panel[data-panel="text"] .pill-group .pill-btn');
+  alignPills.forEach(b => b.classList.remove('active'));
+  if (t.textAlign === 'left') alignPills[0].classList.add('active');
+  else if (t.textAlign === 'center') alignPills[1].classList.add('active');
+  else alignPills[2].classList.add('active');
+
+  // Template thumbs
+  document.querySelectorAll('.tmpl-thumb').forEach((el, i) => {
+    el.classList.toggle('active', i === idx);
+  });
+
+  updatePreview();
+}
+
+function setToggle(id, val) {
+  const el = document.getElementById(id);
+  if (val) el.classList.add('on');
+  else el.classList.remove('on');
+}
+
+function setBgType(type, btn) {
+  state.bgType = type;
+  const pills = btn.parentElement.querySelectorAll('.pill-btn');
+  pills.forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('bgC2Row').style.display = type === 'gradient' ? 'flex' : 'none';
+  document.getElementById('bgAngle').style.display = type === 'gradient' ? '' : 'none';
+  document.getElementById('bgAngleVal').style.display = type === 'gradient' ? '' : 'none';
+  updatePreview();
+}
+
+function setAlign(align, btn) {
+  state.textAlign = align;
+  const pills = btn.parentElement.querySelectorAll('.pill-btn');
+  pills.forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  updatePreview();
+}
+
+function setFormat(fmt, btn) {
+  state.format = fmt;
+  const pills = btn.parentElement.querySelectorAll('.pill-btn');
+  pills.forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  const g = document.getElementById('graphic');
+  if (fmt === 'story') g.classList.add('story');
+  else g.classList.remove('story');
+  updatePreview();
+}
+
+/* BG Presets */
+function initBgPresets() {
+  const el = document.getElementById('bgPresets');
+  el.innerHTML = BG_PRESETS.map((p, i) => {
+    const bg = p.type === 'gradient'
+      ? `linear-gradient(135deg, ${p.c1}, ${p.c2})`
+      : p.c1;
+    return `<div class="preset-swatch" style="background:${bg}" onclick="applyBgPreset(${i})"></div>`;
+  }).join('');
+}
+
+function applyBgPreset(idx) {
+  const p = BG_PRESETS[idx];
+  document.getElementById('bgColor1').value = p.c1;
+  document.getElementById('bgColor2').value = p.c2;
+  state.bgType = p.type;
+  const pills = document.querySelectorAll('.tab-panel[data-panel="background"] .pill-group .pill-btn');
+  pills.forEach(b => b.classList.remove('active'));
+  if (p.type === 'solid') pills[0].classList.add('active');
+  else pills[1].classList.add('active');
+  document.getElementById('bgC2Row').style.display = p.type === 'gradient' ? 'flex' : 'none';
+  document.getElementById('bgAngle').style.display = p.type === 'gradient' ? '' : 'none';
+  document.getElementById('bgAngleVal').style.display = p.type === 'gradient' ? '' : 'none';
+  updatePreview();
+}
+
+/* ═══════════════════════════════════════════ */
+/*  PREVIEW RENDERER                           */
+/* ═══════════════════════════════════════════ */
+function updatePreview() {
+  if (!state.current) return;
+
+  const bgColor1 = document.getElementById('bgColor1').value;
+  const bgColor2 = document.getElementById('bgColor2').value;
+  const bgAngle = document.getElementById('bgAngle').value;
+  const fontFamily = document.getElementById('fontFamily').value;
+  const fontSize = document.getElementById('fontSize').value;
+  const textColor = document.getElementById('textColor').value;
+  const starColor = document.getElementById('starColor').value;
+  const reviewerColor = document.getElementById('reviewerColor').value;
+  const borderColor = document.getElementById('borderColor').value;
+  const brandColor = document.getElementById('brandColor').value;
+  const padding = document.getElementById('padding').value;
+
+  const starShow = document.getElementById('togStars').classList.contains('on');
+  const reviewerShow = document.getElementById('togReviewer').classList.contains('on');
+  const borderShow = document.getElementById('togBorder').classList.contains('on');
+  const brandShow = document.getElementById('togBrand').classList.contains('on');
+
+  const r = state.current;
+
+  // Background
+  const gBg = document.getElementById('gBg');
+  if (state.bgType === 'gradient') {
+    gBg.style.background = `linear-gradient(${bgAngle}deg, ${bgColor1}, ${bgColor2})`;
+  } else {
+    gBg.style.background = bgColor1;
+  }
+
+  // Graphic padding
+  document.getElementById('graphic').style.padding = padding + 'px';
+
+  // Content alignment
+  const content = document.getElementById('gContent');
+  content.style.textAlign = state.textAlign;
+  content.style.alignItems = state.textAlign === 'center' ? 'center' : state.textAlign === 'left' ? 'flex-start' : 'flex-end';
+
+  // Stars
+  const gStars = document.getElementById('gStars');
+  gStars.style.color = starColor;
+  gStars.style.fontSize = '18px';
+  gStars.style.display = starShow ? '' : 'none';
+  gStars.innerHTML = '★'.repeat(r.stars);
+
+  // Quote
+  const gQuote = document.getElementById('gQuote');
+  gQuote.style.fontFamily = fontFamily;
+  gQuote.style.fontSize = fontSize + 'px';
+  gQuote.style.lineHeight = '1.6';
+  gQuote.style.fontWeight = '600';
+  gQuote.style.color = textColor;
+  gQuote.textContent = r.text;
+
+  // Reviewer
+  const gReviewer = document.getElementById('gReviewer');
+  gReviewer.style.color = reviewerColor;
+  gReviewer.style.fontSize = '12px';
+  gReviewer.style.fontWeight = '500';
+  gReviewer.style.letterSpacing = '1px';
+  gReviewer.style.textTransform = 'uppercase';
+  gReviewer.style.display = reviewerShow ? '' : 'none';
+  gReviewer.textContent = r.name;
+
+  // Source
+  const gSource = document.getElementById('gSource');
+  gSource.style.fontSize = '10px';
+  gSource.style.color = reviewerColor;
+  gSource.style.display = reviewerShow ? '' : 'none';
+  gSource.textContent = r.source;
+
+  // Border
+  const gBorder = document.getElementById('gBorder');
+  if (borderShow) {
+    gBorder.style.display = 'block';
+    gBorder.style.inset = '10px';
+    gBorder.style.border = `1px solid ${borderColor}`;
+    gBorder.style.borderRadius = '3px';
+  } else {
+    gBorder.style.display = 'none';
+  }
+
+  // Logo
+  const gLogo = document.getElementById('gLogo');
+  if (state.logoData) {
+    gLogo.src = state.logoData;
+    gLogo.style.display = 'block';
+    gLogo.style.width = '32px';
+    gLogo.style.height = '32px';
+    gLogo.style.bottom = '14px';
+    gLogo.style.left = '50%';
+    gLogo.style.transform = 'translateX(-50%)';
+  }
+
+  // Brand name
+  const gBrand = document.getElementById('gBrand');
+  gBrand.style.color = brandColor;
+  gBrand.style.fontSize = '11px';
+  gBrand.style.fontWeight = '700';
+  gBrand.style.letterSpacing = '2px';
+  gBrand.style.textTransform = 'uppercase';
+  gBrand.style.bottom = '16px';
+  gBrand.style.left = '50%';
+  gBrand.style.transform = 'translateX(-50%)';
+  gBrand.style.whiteSpace = 'nowrap';
+  gBrand.style.display = brandShow ? '' : 'none';
+  gBrand.textContent = state.bizName;
+}
+
+/* ═══════════════════════════════════════════ */
+/*  EXPORT                                     */
+/* ═══════════════════════════════════════════ */
+function exportPNG() {
+  const g = document.getElementById('graphic');
+  const btn = document.querySelector('.btn-download');
+  btn.textContent = 'Saving...';
+
+  html2canvas(g, {
+    scale: 3,
+    useCORS: true,
+    backgroundColor: null,
+  }).then(canvas => {
+    const link = document.createElement('a');
+    link.download = `review-${state.bizName.replace(/\s+/g,'-')}-${Date.now()}.png`;
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+    btn.innerHTML = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg> Save';
+  });
+}
+
+/* ═══════════════════════════════════════════ */
+/*  UTILS                                      */
+/* ═══════════════════════════════════════════ */
+function escapeHtml(text) {
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
+}
+
+/* ═══════════════════════════════════════════ */
+/*  INIT                                       */
+/* ═══════════════════════════════════════════ */
+initTemplates();
+initBgPresets();
+</script>
+
+</body>
+</html>

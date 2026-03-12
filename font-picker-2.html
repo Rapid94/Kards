@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Font Picker 2 — Kards</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@900&family=Sora:wght@800&family=Manrope:wght@800&family=Plus+Jakarta+Sans:wght@800&family=Clash+Display:wght@700&family=Urbanist:wght@900&family=Nunito:wght@900&family=Bricolage+Grotesque:wght@800&family=Archivo+Black&family=Bebas+Neue&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: 'Inter', sans-serif;
+  background: #f2f0e9;
+  min-height: 100vh;
+  padding: 60px 40px;
+}
+h1 {
+  text-align: center;
+  font-size: 18px;
+  font-weight: 600;
+  color: #888;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 50px;
+}
+.grid {
+  max-width: 1000px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+.card {
+  background: #fff;
+  border-radius: 16px;
+  padding: 48px 36px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  cursor: pointer;
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease;
+  border: 2px solid transparent;
+}
+.card:hover {
+  transform: scale(1.03);
+  box-shadow: 0 12px 40px rgba(0,0,0,0.1);
+}
+.card.selected {
+  border-color: #e8685a;
+  box-shadow: 0 0 0 4px rgba(232,104,90,0.15);
+}
+.card .number {
+  font-size: 13px;
+  font-weight: 600;
+  color: #bbb;
+  letter-spacing: 1px;
+}
+.card .kards {
+  font-size: 72px;
+  color: #1a1a1a;
+  letter-spacing: -3px;
+  line-height: 1;
+}
+.card .font-name {
+  font-size: 14px;
+  font-weight: 500;
+  color: #999;
+  font-family: 'Inter', sans-serif;
+}
+
+@media (max-width: 700px) {
+  .grid { grid-template-columns: 1fr; }
+  .card .kards { font-size: 48px; }
+  body { padding: 40px 16px; }
+}
+</style>
+</head>
+<body>
+
+<h1>Pick a font for Kards — Set 2</h1>
+
+<div class="grid">
+  <div class="card" onclick="pick(this)">
+    <span class="number">01</span>
+    <span class="kards" style="font-family:'Outfit',sans-serif;font-weight:900">Kards</span>
+    <span class="font-name">Outfit</span>
+  </div>
+  <div class="card" onclick="pick(this)">
+    <span class="number">02</span>
+    <span class="kards" style="font-family:'Sora',sans-serif;font-weight:800">Kards</span>
+    <span class="font-name">Sora</span>
+  </div>
+  <div class="card" onclick="pick(this)">
+    <span class="number">03</span>
+    <span class="kards" style="font-family:'Manrope',sans-serif;font-weight:800">Kards</span>
+    <span class="font-name">Manrope</span>
+  </div>
+  <div class="card" onclick="pick(this)">
+    <span class="number">04</span>
+    <span class="kards" style="font-family:'Plus Jakarta Sans',sans-serif;font-weight:800">Kards</span>
+    <span class="font-name">Plus Jakarta Sans</span>
+  </div>
+  <div class="card" onclick="pick(this)">
+    <span class="number">05</span>
+    <span class="kards" style="font-family:'Urbanist',sans-serif;font-weight:900">Kards</span>
+    <span class="font-name">Urbanist</span>
+  </div>
+  <div class="card" onclick="pick(this)">
+    <span class="number">06</span>
+    <span class="kards" style="font-family:'Nunito',sans-serif;font-weight:900">Kards</span>
+    <span class="font-name">Nunito</span>
+  </div>
+  <div class="card selected" onclick="pick(this)">
+    <span class="number">07</span>
+    <span class="kards" style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800">Kards</span>
+    <span class="font-name">Bricolage Grotesque — uppercase K</span>
+  </div>
+  <div class="card" onclick="pick(this)">
+    <span class="number">07b</span>
+    <span class="kards" style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800">kards</span>
+    <span class="font-name">Bricolage Grotesque — lowercase k</span>
+  </div>
+  <div class="card" onclick="pick(this)">
+    <span class="number">08</span>
+    <span class="kards" style="font-family:'Archivo Black',sans-serif;font-weight:400;letter-spacing:-2px">Kards</span>
+    <span class="font-name">Archivo Black</span>
+  </div>
+  <div class="card" onclick="pick(this)">
+    <span class="number">09</span>
+    <span class="kards" style="font-family:'Bebas Neue',sans-serif;font-weight:400;letter-spacing:2px">Kards</span>
+    <span class="font-name">Bebas Neue</span>
+  </div>
+  <div class="card" onclick="pick(this)">
+    <span class="number">10</span>
+    <span class="kards" style="font-family:'Clash Display',sans-serif;font-weight:700">Kards</span>
+    <span class="font-name">Clash Display</span>
+  </div>
+</div>
+
+<script>
+function pick(el) {
+  document.querySelectorAll('.card').forEach(function(c) { c.classList.remove('selected'); });
+  el.classList.add('selected');
+}
+</script>
+
+</body>
+</html>

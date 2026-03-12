@@ -1,0 +1,1583 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kards — Editor</title>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@200;400;600;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<style>
+/* ═══════════════════════════════════════════════════ */
+/*  RESET & TOKENS                                     */
+/* ═══════════════════════════════════════════════════ */
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+:root {
+  --bg: #1a1a1a;
+  --surface: #222222;
+  --surface2: #2a2a2a;
+  --border: rgba(255,255,255,0.08);
+  --border-hover: rgba(255,255,255,0.18);
+  --text: #ffffff;
+  --text2: #999999;
+  --text3: #666666;
+  --accent: #ffffff;
+  --radius: 10px;
+  --sidebar-w: 320px;
+  --sidebar-r-w: 260px;
+  --topbar-h: 90px;
+  --transition: 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+html { font-size: 16px; zoom: 1.1; height: 100%; }
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  height: 100%;
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+input, textarea, select, button { font-family: inherit; }
+button { cursor: pointer; border: none; background: none; color: inherit; }
+
+/* ═══════════════════════════════════════════════════ */
+/*  LAYOUT                                             */
+/* ═══════════════════════════════════════════════════ */
+.app {
+  display: grid;
+  grid-template-columns: var(--sidebar-w) 1fr var(--sidebar-r-w);
+  grid-template-rows: var(--topbar-h) 1fr;
+  height: 100%;
+  max-width: 1800px;
+  margin: 0 auto;
+}
+
+/* ═══════════════════════════════════════════════════ */
+/*  TOP BAR                                            */
+/* ═══════════════════════════════════════════════════ */
+.topbar {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding: 14px 14px 14px;
+  background: var(--bg);
+  z-index: 10;
+  overflow: visible;
+}
+.topbar-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  background: #242424;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 8px 12px;
+}
+.topbar-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.hamburger-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  color: var(--text2);
+  transition: all var(--transition);
+}
+.hamburger-btn:hover {
+  color: var(--text);
+  background: rgba(255,255,255,0.06);
+}
+.hamburger-btn svg {
+  width: 20px;
+  height: 20px;
+}
+.topbar-logo img {
+  height: 33px;
+  width: auto;
+  display: block;
+}
+.topbar-center {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.toolbar-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  color: var(--text3);
+  transition: all var(--transition);
+  overflow: visible;
+}
+.toolbar-icon:hover {
+  color: var(--text);
+  background: var(--surface);
+}
+.toolbar-icon svg {
+  width: 18px;
+  height: 18px;
+}
+
+/* Format bar — top of right sidebar */
+.format-bar {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: #242424;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 4px;
+  margin-bottom: 8px;
+}
+.format-btn {
+  flex: 1;
+  padding: 8px 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text3);
+  border-radius: 8px;
+  transition: all var(--transition);
+  letter-spacing: -0.2px;
+  text-align: center;
+}
+.format-btn:hover {
+  color: var(--text2);
+}
+.format-btn.active {
+  background: var(--surface2);
+  color: var(--text);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+}
+.topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.export-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 20px;
+  background: #333333;
+  color: #cccccc;
+  font-size: 13px;
+  font-weight: 600;
+  border-radius: 8px;
+  transition: all var(--transition);
+  letter-spacing: -0.2px;
+  border: 1px solid var(--border);
+}
+.export-btn:hover {
+  background: #3d3d3d;
+  color: #ffffff;
+  transform: translateY(-1px);
+}
+.export-btn:active {
+  transform: translateY(0);
+}
+.export-btn svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* ═══════════════════════════════════════════════════ */
+/*  SIDEBAR                                            */
+/* ═══════════════════════════════════════════════════ */
+.sidebar {
+  background: transparent;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255,255,255,0.1) transparent;
+  padding: 14px 14px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.sidebar::-webkit-scrollbar { width: 4px; }
+.sidebar::-webkit-scrollbar-track { background: transparent; }
+.sidebar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 4px; }
+
+/* Pill section — self-contained card */
+.pill-section {
+  background: #242424;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  overflow: hidden;
+  transition: border-color var(--transition);
+}
+.pill-section:hover {
+  border-color: var(--border-hover);
+}
+.pill-section.active {
+  border-color: rgba(255,255,255,0.18);
+}
+
+.pill-btn {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 14px 20px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: all var(--transition);
+  color: var(--text);
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: -0.2px;
+}
+.pill-btn svg {
+  width: 18px;
+  height: 18px;
+  color: var(--text2);
+  flex-shrink: 0;
+}
+.pill-btn .pill-chevron {
+  margin-left: auto;
+  width: 14px;
+  height: 14px;
+  color: var(--text3);
+  transition: transform var(--transition);
+}
+.pill-section.active .pill-chevron {
+  transform: rotate(90deg);
+}
+
+/* Panel that slides open below header */
+.pill-panel {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+.pill-section.active .pill-panel {
+  max-height: 600px;
+}
+.pill-panel-inner {
+  padding: 0 16px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  border-top: 1px solid var(--border);
+  margin: 0 8px;
+  padding-top: 14px;
+}
+
+/* Form elements */
+.field-label {
+  display: block;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text3);
+  margin-bottom: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.field-input {
+  width: 100%;
+  padding: 10px 12px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  font-size: 13px;
+  outline: none;
+  transition: border-color var(--transition);
+}
+.field-input:focus {
+  border-color: var(--border-hover);
+}
+.field-input::placeholder {
+  color: var(--text3);
+}
+textarea.field-input {
+  resize: vertical;
+  min-height: 80px;
+  line-height: 1.5;
+}
+
+/* Star rating */
+.star-rating {
+  display: flex;
+  gap: 4px;
+}
+.star-btn {
+  font-size: 22px;
+  color: var(--text3);
+  transition: all var(--transition);
+  padding: 2px;
+  line-height: 1;
+}
+.star-btn.active {
+  color: #facc15;
+}
+.star-btn:hover {
+  transform: scale(1.15);
+}
+
+/* Logo upload */
+.logo-upload-area {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.logo-preview {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+.logo-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+.logo-preview svg {
+  width: 18px;
+  height: 18px;
+  color: var(--text3);
+}
+.logo-upload-btn {
+  padding: 7px 14px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text2);
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  transition: all var(--transition);
+}
+.logo-upload-btn:hover {
+  border-color: var(--border-hover);
+  color: var(--text);
+}
+.logo-remove-btn {
+  padding: 7px 10px;
+  font-size: 12px;
+  color: var(--text3);
+  border-radius: 6px;
+  transition: color var(--transition);
+  display: none;
+}
+.logo-remove-btn:hover { color: #ef4444; }
+.logo-remove-btn.visible { display: block; }
+
+/* Template grid */
+.template-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+.template-card {
+  aspect-ratio: 1;
+  border-radius: 8px;
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: all var(--transition);
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  padding: 8px;
+}
+.template-card:hover {
+  border-color: rgba(255,255,255,0.15);
+  transform: scale(1.03);
+}
+.template-card.active {
+  border-color: #ffffff;
+  box-shadow: 0 0 0 1px #ffffff;
+}
+.template-card .t-stars {
+  font-size: 6px;
+  letter-spacing: 1px;
+}
+.template-card .t-line {
+  width: 60%;
+  height: 2px;
+  border-radius: 1px;
+  opacity: 0.5;
+}
+.template-card .t-line2 {
+  width: 40%;
+  height: 2px;
+  border-radius: 1px;
+  opacity: 0.3;
+}
+
+/* Color pickers */
+.color-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.color-picker-wrap {
+  position: relative;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.color-picker-wrap input[type="color"] {
+  position: absolute;
+  inset: -4px;
+  width: calc(100% + 8px);
+  height: calc(100% + 8px);
+  border: none;
+  cursor: pointer;
+  background: none;
+}
+.color-picker-wrap input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; }
+.color-picker-wrap input[type="color"]::-webkit-color-swatch { border: none; border-radius: 0; }
+.color-hex {
+  flex: 1;
+  padding: 8px 10px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text2);
+  font-size: 12px;
+  font-family: 'Inter', monospace;
+  outline: none;
+  transition: border-color var(--transition);
+}
+.color-hex:focus { border-color: var(--border-hover); }
+
+/* Sliders */
+.slider-row {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.slider-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.slider-label {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text3);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.slider-value {
+  font-size: 11px;
+  color: var(--text2);
+  font-variant-numeric: tabular-nums;
+}
+input[type="range"] {
+  -webkit-appearance: none;
+  width: 100%;
+  height: 5px;
+  background: var(--surface2);
+  border-radius: 3px;
+  outline: none;
+  accent-color: hsl(180, 80%, 28%);
+}
+input[type="range"]::-webkit-slider-runnable-track {
+  height: 5px;
+  border-radius: 3px;
+  background: linear-gradient(to right, hsl(180, 70%, 32%) 0%, hsl(180, 70%, 32%) var(--range-pct, 50%), var(--surface2) var(--range-pct, 50%), var(--surface2) 100%);
+}
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 14px;
+  height: 14px;
+  background: #ffffff;
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.4);
+  transition: transform var(--transition);
+}
+input[type="range"]::-webkit-slider-thumb:hover {
+  transform: scale(1.2);
+}
+input[type="range"]::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  background: #ffffff;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.4);
+}
+
+/* ═══════════════════════════════════════════════════ */
+/*  RIGHT SIDEBAR                                      */
+/* ═══════════════════════════════════════════════════ */
+.sidebar-right {
+  background: transparent;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255,255,255,0.1) transparent;
+  display: flex;
+  flex-direction: column;
+  padding: 14px 14px 20px;
+  min-height: 0;
+}
+.sidebar-right::-webkit-scrollbar { width: 4px; }
+.sidebar-right::-webkit-scrollbar-track { background: transparent; }
+.sidebar-right::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 4px; }
+
+/* Scene preset grid — rounded container */
+.scene-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1;
+  min-height: 0;
+  background: #242424;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 8px;
+}
+.scene-card {
+  flex: 1;
+  min-height: 0;
+  border-radius: 12px;
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: all var(--transition);
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  perspective: 300px;
+}
+.scene-card:hover {
+  border-color: rgba(255,255,255,0.2);
+}
+.scene-card.active {
+  border-color: #ffffff;
+  box-shadow: 0 0 0 1px #ffffff;
+}
+.scene-mini {
+  width: 65%;
+  height: 65%;
+  border-radius: 4px;
+  background: #1a1a1a;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  padding: 6px;
+  pointer-events: none;
+}
+.scene-mini .sm-stars {
+  font-size: 5px;
+  color: #facc15;
+  letter-spacing: 0.5px;
+}
+.scene-mini .sm-line {
+  width: 65%;
+  height: 1.5px;
+  background: rgba(255,255,255,0.3);
+  border-radius: 1px;
+}
+.scene-mini .sm-line2 {
+  width: 40%;
+  height: 1.5px;
+  background: rgba(255,255,255,0.15);
+  border-radius: 1px;
+}
+/* White card variant for light backgrounds */
+.scene-mini.light {
+  background: #ffffff;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+}
+.scene-mini.light .sm-stars { color: #facc15; }
+.scene-mini.light .sm-line { background: rgba(0,0,0,0.2); }
+.scene-mini.light .sm-line2 { background: rgba(0,0,0,0.1); }
+
+/* ═══════════════════════════════════════════════════ */
+/*  PREVIEW AREA                                       */
+/* ═══════════════════════════════════════════════════ */
+.preview-area {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg);
+  position: relative;
+  overflow: hidden;
+  padding: 14px;
+}
+.preview-stage {
+  width: 100%;
+  height: 100%;
+  background: #242424;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.preview-wrapper {
+  position: relative;
+  z-index: 1;
+  transition: transform 0.3s ease;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.05);
+}
+
+/* ═══════════════════════════════════════════════════ */
+/*  THE CARD (the actual exportable graphic)           */
+/* ═══════════════════════════════════════════════════ */
+.card-canvas {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── Template 1: Clean White ────────────────────── */
+.card-canvas.tpl-1 {
+  background: #ffffff;
+  color: #1a1a1a;
+}
+.card-canvas.tpl-1 .card-inner {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  height: 100%;
+}
+.card-canvas.tpl-1 .card-stars { color: #facc15; }
+.card-canvas.tpl-1 .card-review { color: #1a1a1a; }
+.card-canvas.tpl-1 .card-reviewer { color: #666666; }
+.card-canvas.tpl-1 .card-brand { color: #999999; }
+
+/* ── Template 2: Dark Modern ────────────────────── */
+.card-canvas.tpl-2 {
+  background: #111111;
+  color: #ffffff;
+}
+.card-canvas.tpl-2 .card-inner {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  height: 100%;
+}
+.card-canvas.tpl-2 .card-stars { color: #facc15; }
+.card-canvas.tpl-2 .card-review { color: #ffffff; }
+.card-canvas.tpl-2 .card-reviewer { color: #888888; }
+.card-canvas.tpl-2 .card-brand { color: #555555; }
+
+/* ── Template 3: Warm Gradient ──────────────────── */
+.card-canvas.tpl-3 {
+  background: linear-gradient(135deg, #f97316, #ef4444, #ec4899);
+  color: #ffffff;
+}
+.card-canvas.tpl-3 .card-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  height: 100%;
+}
+.card-canvas.tpl-3 .card-stars { color: #ffffff; }
+.card-canvas.tpl-3 .card-review { color: #ffffff; }
+.card-canvas.tpl-3 .card-reviewer { color: rgba(255,255,255,0.8); }
+.card-canvas.tpl-3 .card-brand { color: rgba(255,255,255,0.6); }
+
+/* ── Template 4: Minimal Quotes ─────────────────── */
+.card-canvas.tpl-4 {
+  background: #fafafa;
+  color: #1a1a1a;
+}
+.card-canvas.tpl-4 .card-inner {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  height: 100%;
+  position: relative;
+}
+.card-canvas.tpl-4 .card-quote-mark {
+  display: block !important;
+  font-family: 'Bricolage Grotesque', serif;
+  font-weight: 800;
+  color: rgba(0,0,0,0.06);
+  line-height: 0.8;
+  position: absolute;
+  top: -2%;
+  left: -3%;
+}
+.card-canvas.tpl-4 .card-stars { color: #facc15; }
+.card-canvas.tpl-4 .card-review { color: #1a1a1a; position: relative; z-index: 1; }
+.card-canvas.tpl-4 .card-reviewer { color: #666666; position: relative; z-index: 1; }
+.card-canvas.tpl-4 .card-brand { color: #999999; position: relative; z-index: 1; }
+
+/* ── Template 5: Bold Color ─────────────────────── */
+.card-canvas.tpl-5 {
+  background: #2563eb;
+  color: #ffffff;
+}
+.card-canvas.tpl-5 .card-inner {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  height: 100%;
+}
+.card-canvas.tpl-5 .card-stars { color: #fde68a; }
+.card-canvas.tpl-5 .card-review { color: #ffffff; font-weight: 600; }
+.card-canvas.tpl-5 .card-reviewer { color: rgba(255,255,255,0.7); }
+.card-canvas.tpl-5 .card-brand { color: rgba(255,255,255,0.5); }
+
+/* ── Template 6: Split Layout ───────────────────── */
+.card-canvas.tpl-6 {
+  background: #ffffff;
+  color: #1a1a1a;
+  flex-direction: row !important;
+}
+.card-canvas.tpl-6 .card-color-block {
+  display: flex !important;
+  width: 38%;
+  height: 100%;
+  background: #1a1a1a;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5%;
+  flex-shrink: 0;
+}
+.card-canvas.tpl-6 .card-color-block .card-stars { color: #facc15; }
+.card-canvas.tpl-6 .card-color-block .block-brand {
+  color: #ffffff;
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-weight: 800;
+  text-align: center;
+  padding: 0 10%;
+  line-height: 1.2;
+}
+.card-canvas.tpl-6 .card-color-block .block-logo {
+  width: 30%;
+  max-height: 20%;
+  object-fit: contain;
+}
+.card-canvas.tpl-6 .card-inner {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  flex: 1;
+  height: 100%;
+}
+.card-canvas.tpl-6 .card-stars { display: none; }
+.card-canvas.tpl-6 .card-review { color: #1a1a1a; }
+.card-canvas.tpl-6 .card-reviewer { color: #666666; }
+.card-canvas.tpl-6 .card-brand-bottom { display: none; }
+
+/* Card inner shared styles */
+.card-color-block { display: none; }
+.card-quote-mark { display: none; }
+.card-inner {
+  padding: var(--card-padding, 60px);
+}
+.card-stars {
+  font-size: var(--star-size, 24px);
+  letter-spacing: 3px;
+  margin-bottom: 4%;
+}
+.card-review {
+  font-size: var(--review-font-size, 22px);
+  line-height: 1.55;
+  margin-bottom: 6%;
+  font-weight: 400;
+}
+.card-reviewer {
+  font-size: calc(var(--review-font-size, 22px) * 0.7);
+  font-weight: 600;
+  margin-bottom: 2%;
+}
+.card-brand-bottom {
+  font-size: calc(var(--review-font-size, 22px) * 0.55);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  margin-top: auto;
+  padding-top: 4%;
+  opacity: 0.6;
+}
+.card-brand-bottom .brand-logo-inline {
+  height: calc(var(--review-font-size, 22px) * 0.9);
+  width: auto;
+  object-fit: contain;
+  vertical-align: middle;
+  margin-right: 8px;
+}
+
+/* ═══════════════════════════════════════════════════ */
+/*  EXPORT OVERLAY                                     */
+/* ═══════════════════════════════════════════════════ */
+.export-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.7);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+.export-overlay.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+.export-spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid rgba(255,255,255,0.15);
+  border-top-color: #ffffff;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+</style>
+</head>
+<body>
+
+<div class="app">
+  <!-- ═══ TOP BAR ═══ -->
+  <div class="topbar">
+   <div class="topbar-bar">
+    <div class="topbar-left">
+      <button class="hamburger-btn" title="Menu">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+      <a href="index.html" class="topbar-logo">
+        <img src="black-logo.svg" alt="Kards">
+      </a>
+    </div>
+    <div class="topbar-center">
+      <button class="toolbar-icon" title="Undo" onclick="undo()">
+        <svg viewBox="-1 -1 26 26" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" overflow="visible"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 105.64-8.36L1 10"/></svg>
+      </button>
+      <button class="toolbar-icon" title="Redo" onclick="redo()">
+        <svg viewBox="-1 -1 26 26" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" overflow="visible"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 11-5.64-8.36L23 10"/></svg>
+      </button>
+      <button class="toolbar-icon" title="Start Over" onclick="startOver()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6"/></svg>
+      </button>
+      <button class="toolbar-icon" title="Drafts">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>
+      </button>
+    </div>
+    <div class="topbar-right">
+      <button class="export-btn" onclick="exportPNG()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Export PNG
+      </button>
+    </div>
+   </div>
+  </div>
+
+  <!-- ═══ SIDEBAR ═══ -->
+  <div class="sidebar">
+
+    <!-- Review (was Colors) -->
+    <div class="pill-section">
+      <button class="pill-btn" onclick="togglePill(this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="8" r="2" fill="currentColor"/><circle cx="8" cy="14" r="2" fill="currentColor"/><circle cx="16" cy="14" r="2" fill="currentColor"/></svg>
+        Review
+        <svg class="pill-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+      </button>
+      <div class="pill-panel">
+        <div class="pill-panel-inner">
+          <div>
+            <label class="field-label">Text Color</label>
+            <div class="color-row">
+              <div class="color-picker-wrap">
+                <input type="color" id="textColor" value="#1a1a1a" oninput="updateStyleFromColor('text')">
+              </div>
+              <input class="color-hex" type="text" id="textColorHex" value="#1a1a1a" onchange="updateStyleFromHex('text')">
+            </div>
+          </div>
+          <div class="slider-row">
+            <div class="slider-header">
+              <span class="slider-label">Font Size</span>
+              <span class="slider-value" id="fontSizeVal">22px</span>
+            </div>
+            <input type="range" id="fontSize" min="14" max="32" value="22" oninput="updateSlider('fontSize')">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Backdrop -->
+    <div class="pill-section">
+      <button class="pill-btn" onclick="togglePill(this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="20" height="20" rx="4"/><circle cx="12" cy="12" r="4"/></svg>
+        Backdrop
+        <svg class="pill-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+      </button>
+      <div class="pill-panel">
+        <div class="pill-panel-inner">
+          <div>
+            <label class="field-label">Background Color</label>
+            <div class="color-row">
+              <div class="color-picker-wrap">
+                <input type="color" id="bgColor" value="#ffffff" oninput="updateStyleFromColor('bg')">
+              </div>
+              <input class="color-hex" type="text" id="bgColorHex" value="#ffffff" onchange="updateStyleFromHex('bg')">
+            </div>
+          </div>
+          <div class="template-grid">
+            <div class="template-card active" data-tpl="1" onclick="setTemplate(1)" style="background:#ffffff;">
+              <span class="t-stars" style="color:#facc15;">&#9733;&#9733;&#9733;&#9733;&#9733;</span>
+              <div class="t-line" style="background:#1a1a1a;"></div>
+              <div class="t-line2" style="background:#1a1a1a;"></div>
+            </div>
+            <div class="template-card" data-tpl="2" onclick="setTemplate(2)" style="background:#111111;">
+              <span class="t-stars" style="color:#facc15;">&#9733;&#9733;&#9733;&#9733;&#9733;</span>
+              <div class="t-line" style="background:#ffffff;"></div>
+              <div class="t-line2" style="background:#ffffff;"></div>
+            </div>
+            <div class="template-card" data-tpl="3" onclick="setTemplate(3)" style="background:linear-gradient(135deg,#f97316,#ef4444,#ec4899);">
+              <span class="t-stars" style="color:#ffffff;">&#9733;&#9733;&#9733;&#9733;&#9733;</span>
+              <div class="t-line" style="background:#ffffff;"></div>
+              <div class="t-line2" style="background:#ffffff;"></div>
+            </div>
+            <div class="template-card" data-tpl="4" onclick="setTemplate(4)" style="background:#fafafa;">
+              <span style="font-size:16px;color:rgba(0,0,0,0.1);font-weight:800;line-height:1;">&ldquo;</span>
+              <div class="t-line" style="background:#1a1a1a;"></div>
+              <div class="t-line2" style="background:#1a1a1a;"></div>
+            </div>
+            <div class="template-card" data-tpl="5" onclick="setTemplate(5)" style="background:#2563eb;">
+              <span class="t-stars" style="color:#fde68a;">&#9733;&#9733;&#9733;&#9733;&#9733;</span>
+              <div class="t-line" style="background:#ffffff;"></div>
+              <div class="t-line2" style="background:#ffffff;"></div>
+            </div>
+            <div class="template-card" data-tpl="6" onclick="setTemplate(6)" style="background:linear-gradient(90deg,#1a1a1a 40%,#ffffff 40%);">
+              <div class="t-line" style="background:#888;width:80%;"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Border -->
+    <div class="pill-section">
+      <button class="pill-btn" onclick="togglePill(this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="4"/></svg>
+        Border
+        <svg class="pill-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+      </button>
+      <div class="pill-panel">
+        <div class="pill-panel-inner">
+          <div class="slider-row">
+            <div class="slider-header">
+              <span class="slider-label">Border Radius</span>
+              <span class="slider-value" id="borderRadiusVal">0px</span>
+            </div>
+            <input type="range" id="borderRadius" min="0" max="30" value="0" oninput="updateSlider('borderRadius')">
+          </div>
+          <div class="slider-row">
+            <div class="slider-header">
+              <span class="slider-label">Padding</span>
+              <span class="slider-value" id="paddingVal">60px</span>
+            </div>
+            <input type="range" id="padding" min="20" max="60" value="60" oninput="updateSlider('padding')">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Shadow -->
+    <div class="pill-section">
+      <button class="pill-btn" onclick="togglePill(this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 3v18m-7-7h14"/><circle cx="12" cy="12" r="9" opacity="0.3"/></svg>
+        Shadow
+        <svg class="pill-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+      </button>
+      <div class="pill-panel">
+        <div class="pill-panel-inner">
+          <div class="slider-row">
+            <div class="slider-header">
+              <span class="slider-label">Shadow Depth</span>
+              <span class="slider-value" id="shadowVal">20px</span>
+            </div>
+            <input type="range" id="shadowDepth" min="0" max="80" value="20" oninput="updateShadow()">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Fonts -->
+    <div class="pill-section">
+      <button class="pill-btn" onclick="togglePill(this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><text x="3" y="17" font-size="14" font-weight="700" fill="currentColor" stroke="none">Aa</text></svg>
+        Fonts
+        <svg class="pill-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+      </button>
+      <div class="pill-panel">
+        <div class="pill-panel-inner">
+          <div>
+            <label class="field-label">Review Text</label>
+            <textarea class="field-input" id="reviewText" placeholder="Paste your Google review here..." oninput="updatePreview()">Amazing food and incredible service! The atmosphere was perfect for our anniversary dinner. Will definitely be coming back!</textarea>
+          </div>
+          <div>
+            <label class="field-label">Reviewer Name</label>
+            <input class="field-input" type="text" id="reviewerName" value="Sarah M." placeholder="Reviewer name" oninput="updatePreview()">
+          </div>
+          <div>
+            <label class="field-label">Business Name</label>
+            <input class="field-input" type="text" id="businessName" value="Your Business" placeholder="Business name" oninput="updatePreview()">
+          </div>
+          <div>
+            <label class="field-label">Star Rating</label>
+            <div class="star-rating" id="starRating">
+              <button class="star-btn active" data-star="1" onclick="setStars(1)">&#9733;</button>
+              <button class="star-btn active" data-star="2" onclick="setStars(2)">&#9733;</button>
+              <button class="star-btn active" data-star="3" onclick="setStars(3)">&#9733;</button>
+              <button class="star-btn active" data-star="4" onclick="setStars(4)">&#9733;</button>
+              <button class="star-btn active" data-star="5" onclick="setStars(5)">&#9733;</button>
+            </div>
+          </div>
+          <div>
+            <label class="field-label">Logo</label>
+            <div class="logo-upload-area">
+              <div class="logo-preview" id="logoPreview">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+              </div>
+              <button class="logo-upload-btn" onclick="document.getElementById('logoFile').click()">Upload</button>
+              <button class="logo-remove-btn" id="logoRemoveBtn" onclick="removeLogo()">Remove</button>
+              <input type="file" id="logoFile" accept="image/*" style="display:none" onchange="handleLogo(event)">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ═══ PREVIEW AREA ═══ -->
+  <div class="preview-area" id="previewArea">
+    <div class="preview-stage" id="previewStage">
+    <div class="preview-wrapper" id="previewWrapper">
+      <div class="card-canvas tpl-1" id="cardCanvas">
+        <!-- Color block for template 6 -->
+        <div class="card-color-block">
+          <img class="block-logo" id="blockLogo" style="display:none">
+          <div class="card-stars" id="blockStars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+          <div class="block-brand" id="blockBrand">Your Business</div>
+        </div>
+        <div class="card-inner">
+          <div class="card-quote-mark" id="quoteMark">&ldquo;</div>
+          <div class="card-stars" id="cardStars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+          <div class="card-review" id="cardReview">Amazing food and incredible service! The atmosphere was perfect for our anniversary dinner. Will definitely be coming back!</div>
+          <div class="card-reviewer" id="cardReviewer">&mdash; Sarah M.</div>
+          <div class="card-brand-bottom" id="cardBrand">Your Business</div>
+        </div>
+      </div>
+    </div>
+    </div><!-- /.preview-stage -->
+  </div>
+
+  <!-- ═══ RIGHT SIDEBAR ═══ -->
+  <div class="sidebar-right">
+    <div class="format-bar">
+      <button class="format-btn active" data-format="1:1" onclick="setFormat('1:1')">1:1</button>
+      <button class="format-btn" data-format="4:5" onclick="setFormat('4:5')">4:5</button>
+      <button class="format-btn" data-format="16:9" onclick="setFormat('16:9')">16:9</button>
+    </div>
+    <div class="scene-grid" id="sceneGrid">
+      <div class="scene-card active" data-scene="0" onclick="setScene(0)">
+        <div class="scene-mini">
+          <span class="sm-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span>
+          <div class="sm-line"></div>
+          <div class="sm-line2"></div>
+        </div>
+      </div>
+      <div class="scene-card" data-scene="1" onclick="setScene(1)">
+        <div class="scene-mini" style="transform:rotateY(-8deg) rotateX(4deg) rotateZ(2deg);">
+          <span class="sm-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span>
+          <div class="sm-line"></div>
+          <div class="sm-line2"></div>
+        </div>
+      </div>
+      <div class="scene-card" data-scene="2" onclick="setScene(2)">
+        <div class="scene-mini" style="transform:rotateY(6deg) rotateZ(-3deg);">
+          <span class="sm-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span>
+          <div class="sm-line"></div>
+          <div class="sm-line2"></div>
+        </div>
+      </div>
+      <div class="scene-card" data-scene="3" onclick="setScene(3)">
+        <div class="scene-mini" style="transform:rotateX(6deg) rotateZ(3deg);">
+          <span class="sm-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span>
+          <div class="sm-line"></div>
+          <div class="sm-line2"></div>
+        </div>
+      </div>
+      <div class="scene-card" data-scene="4" onclick="setScene(4)">
+        <div class="scene-mini" style="transform:rotateY(10deg) rotateX(5deg);">
+          <span class="sm-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span>
+          <div class="sm-line"></div>
+          <div class="sm-line2"></div>
+        </div>
+      </div>
+      <div class="scene-card" data-scene="5" onclick="setScene(5)">
+        <div class="scene-mini" style="transform:rotateY(-5deg) rotateX(3deg) rotateZ(2deg);">
+          <span class="sm-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span>
+          <div class="sm-line"></div>
+          <div class="sm-line2"></div>
+        </div>
+      </div>
+      <div class="scene-card" data-scene="6" onclick="setScene(6)">
+        <div class="scene-mini" style="transform:rotateY(-7deg) rotateZ(2deg);">
+          <span class="sm-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span>
+          <div class="sm-line"></div>
+          <div class="sm-line2"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Export overlay -->
+<div class="export-overlay" id="exportOverlay">
+  <div class="export-spinner"></div>
+</div>
+
+<script>
+/* ═══════════════════════════════════════════════════ */
+/*  TOOLBAR ACTIONS (placeholder)                      */
+/* ═══════════════════════════════════════════════════ */
+function undo() { /* TODO */ }
+function redo() { /* TODO */ }
+function startOver() {
+  if (confirm('Start over? This will reset all settings.')) location.reload();
+}
+
+/* ═══════════════════════════════════════════════════ */
+/*  STATE                                              */
+/* ═══════════════════════════════════════════════════ */
+const state = {
+  format: '1:1',
+  template: 1,
+  stars: 5,
+  logoDataUrl: null,
+  customBg: null,
+  customText: null,
+};
+
+const formats = {
+  '1:1':  { w: 1080, h: 1080 },
+  '4:5':  { w: 1080, h: 1350 },
+  '16:9': { w: 1920, h: 1080 },
+};
+
+const templateDefaults = {
+  1: { bg: '#ffffff', text: '#1a1a1a' },
+  2: { bg: '#111111', text: '#ffffff' },
+  3: { bg: '#f97316', text: '#ffffff' },
+  4: { bg: '#fafafa', text: '#1a1a1a' },
+  5: { bg: '#2563eb', text: '#ffffff' },
+  6: { bg: '#ffffff', text: '#1a1a1a' },
+};
+
+/* ═══════════════════════════════════════════════════ */
+/*  SECTIONS                                           */
+/* ═══════════════════════════════════════════════════ */
+function toggleSection(header) {
+  header.parentElement.classList.toggle('collapsed');
+}
+
+function togglePill(btn) {
+  const section = btn.closest('.pill-section');
+  const wasActive = section.classList.contains('active');
+  // Close all sections
+  document.querySelectorAll('.pill-section').forEach(s => s.classList.remove('active'));
+  // Toggle this one
+  if (!wasActive) {
+    section.classList.add('active');
+  }
+}
+
+function updateShadow() {
+  const el = document.getElementById('shadowDepth');
+  const depth = el.value;
+  document.getElementById('shadowVal').textContent = depth + 'px';
+  updateRangeTrack(el);
+  const wrapper = document.getElementById('previewWrapper');
+  wrapper.style.boxShadow = `0 ${depth}px ${depth * 2}px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.05)`;
+}
+
+/* ═══════════════════════════════════════════════════ */
+/*  FORMAT                                             */
+/* ═══════════════════════════════════════════════════ */
+function setFormat(fmt) {
+  state.format = fmt;
+  document.querySelectorAll('.format-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.format === fmt);
+  });
+  resizeCanvas();
+}
+
+function resizeCanvas() {
+  const canvas = document.getElementById('cardCanvas');
+  const { w, h } = formats[state.format];
+  canvas.style.width = w + 'px';
+  canvas.style.height = h + 'px';
+  scalePreview();
+}
+
+function scalePreview() {
+  const stage = document.getElementById('previewStage');
+  const wrapper = document.getElementById('previewWrapper');
+  const canvas = document.getElementById('cardCanvas');
+  const { w, h } = formats[state.format];
+
+  const stageRect = stage.getBoundingClientRect();
+  const padX = 60, padY = 60;
+  const availW = stageRect.width - padX;
+  const availH = stageRect.height - padY;
+
+  const scale = Math.min(availW / w, availH / h, 1) * 0.55;
+  wrapper.style.transformOrigin = 'center center';
+  wrapper.style.width = w + 'px';
+  wrapper.style.height = h + 'px';
+
+  // Apply scene angle if set
+  const preset = typeof currentScene !== 'undefined' ? scenePresets[currentScene] : null;
+  const rx = preset ? preset.rx : 0;
+  const ry = preset ? preset.ry : 0;
+  const rz = preset ? preset.rz : 0;
+  if (rx === 0 && ry === 0 && rz === 0) {
+    wrapper.style.transform = `scale(${scale})`;
+  } else {
+    wrapper.style.transform = `perspective(1200px) scale(${scale}) rotateX(${rx}deg) rotateY(${ry}deg) rotateZ(${rz}deg)`;
+  }
+}
+
+/* ═══════════════════════════════════════════════════ */
+/*  STARS                                              */
+/* ═══════════════════════════════════════════════════ */
+function setStars(n) {
+  state.stars = n;
+  document.querySelectorAll('.star-btn').forEach(b => {
+    b.classList.toggle('active', parseInt(b.dataset.star) <= n);
+  });
+  updatePreview();
+}
+
+/* ═══════════════════════════════════════════════════ */
+/*  TEMPLATE                                           */
+/* ═══════════════════════════════════════════════════ */
+function setTemplate(n) {
+  state.template = n;
+  state.customBg = null;
+  state.customText = null;
+
+  document.querySelectorAll('.template-card').forEach(c => {
+    c.classList.toggle('active', parseInt(c.dataset.tpl) === n);
+  });
+
+  const canvas = document.getElementById('cardCanvas');
+  canvas.className = 'card-canvas tpl-' + n;
+
+  // Update color pickers to match template defaults
+  const defaults = templateDefaults[n];
+  document.getElementById('bgColor').value = defaults.bg;
+  document.getElementById('bgColorHex').value = defaults.bg;
+  document.getElementById('textColor').value = defaults.text;
+  document.getElementById('textColorHex').value = defaults.text;
+
+  updatePreview();
+  syncSceneCards();
+}
+
+/* ═══════════════════════════════════════════════════ */
+/*  LOGO                                               */
+/* ═══════════════════════════════════════════════════ */
+function handleLogo(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    state.logoDataUrl = e.target.result;
+    document.getElementById('logoPreview').innerHTML = '<img src="' + e.target.result + '" alt="Logo">';
+    document.getElementById('logoRemoveBtn').classList.add('visible');
+    updatePreview();
+  };
+  reader.readAsDataURL(file);
+}
+
+function removeLogo() {
+  state.logoDataUrl = null;
+  document.getElementById('logoPreview').innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>';
+  document.getElementById('logoRemoveBtn').classList.remove('visible');
+  document.getElementById('logoFile').value = '';
+  updatePreview();
+}
+
+/* ═══════════════════════════════════════════════════ */
+/*  STYLE CONTROLS                                     */
+/* ═══════════════════════════════════════════════════ */
+function updateStyleFromColor(type) {
+  if (type === 'bg') {
+    const val = document.getElementById('bgColor').value;
+    document.getElementById('bgColorHex').value = val;
+    state.customBg = val;
+  } else {
+    const val = document.getElementById('textColor').value;
+    document.getElementById('textColorHex').value = val;
+    state.customText = val;
+  }
+  updatePreview();
+  if (type === 'bg') syncSceneCards();
+}
+
+function updateStyleFromHex(type) {
+  if (type === 'bg') {
+    let val = document.getElementById('bgColorHex').value.trim();
+    if (!val.startsWith('#')) val = '#' + val;
+    document.getElementById('bgColor').value = val;
+    state.customBg = val;
+  } else {
+    let val = document.getElementById('textColorHex').value.trim();
+    if (!val.startsWith('#')) val = '#' + val;
+    document.getElementById('textColor').value = val;
+    state.customText = val;
+  }
+  updatePreview();
+  if (type === 'bg') syncSceneCards();
+}
+
+function updateSlider(id) {
+  const el = document.getElementById(id);
+  const val = el.value;
+  document.getElementById(id + 'Val').textContent = val + 'px';
+  updateRangeTrack(el);
+  updatePreview();
+}
+
+function updateRangeTrack(el) {
+  const pct = ((el.value - el.min) / (el.max - el.min)) * 100;
+  el.style.setProperty('--range-pct', pct + '%');
+}
+
+/* ═══════════════════════════════════════════════════ */
+/*  PREVIEW UPDATE                                     */
+/* ═══════════════════════════════════════════════════ */
+function updatePreview() {
+  const canvas = document.getElementById('cardCanvas');
+  const reviewText = document.getElementById('reviewText').value;
+  const reviewerName = document.getElementById('reviewerName').value;
+  const businessName = document.getElementById('businessName').value;
+  const fontSize = document.getElementById('fontSize').value;
+  const borderRadius = document.getElementById('borderRadius').value;
+  const padding = document.getElementById('padding').value;
+
+  // Stars
+  const starStr = '&#9733;'.repeat(state.stars) + '<span style="opacity:0.2">' + '&#9733;'.repeat(5 - state.stars) + '</span>';
+  document.getElementById('cardStars').innerHTML = starStr;
+  document.getElementById('blockStars').innerHTML = starStr;
+
+  // Review text
+  document.getElementById('cardReview').textContent = reviewText || 'Your review will appear here...';
+
+  // Reviewer
+  document.getElementById('cardReviewer').innerHTML = reviewerName ? '&mdash; ' + reviewerName : '';
+
+  // Brand
+  let brandHTML = '';
+  if (state.logoDataUrl) {
+    brandHTML += '<img class="brand-logo-inline" src="' + state.logoDataUrl + '">';
+  }
+  brandHTML += (businessName || '');
+  document.getElementById('cardBrand').innerHTML = brandHTML;
+  document.getElementById('blockBrand').textContent = businessName || '';
+
+  // Block logo for template 6
+  const blockLogoEl = document.getElementById('blockLogo');
+  if (state.logoDataUrl) {
+    blockLogoEl.src = state.logoDataUrl;
+    blockLogoEl.style.display = 'block';
+  } else {
+    blockLogoEl.style.display = 'none';
+  }
+
+  // Custom style overrides
+  canvas.style.borderRadius = borderRadius + 'px';
+  canvas.style.setProperty('--card-padding', padding + 'px');
+  canvas.style.setProperty('--review-font-size', fontSize + 'px');
+
+  // Quote mark size scales with canvas
+  const { h } = formats[state.format];
+  document.getElementById('quoteMark').style.fontSize = (h * 0.35) + 'px';
+
+  // Custom colors (override template)
+  if (state.customBg) {
+    if (state.template !== 3) {
+      canvas.style.background = state.customBg;
+    }
+    // For template 6, apply to color block
+    if (state.template === 6) {
+      canvas.querySelector('.card-color-block').style.background = state.customBg;
+    }
+  } else {
+    canvas.style.background = '';
+    if (state.template === 6) {
+      canvas.querySelector('.card-color-block').style.background = '';
+    }
+  }
+  if (state.customText) {
+    canvas.querySelector('.card-review').style.color = state.customText;
+    canvas.querySelector('.card-reviewer').style.color = state.customText;
+  } else {
+    canvas.querySelector('.card-review').style.color = '';
+    canvas.querySelector('.card-reviewer').style.color = '';
+  }
+
+  // Star sizing
+  const starSize = Math.max(18, Math.round(fontSize * 1.1));
+  canvas.style.setProperty('--star-size', starSize + 'px');
+
+  // Block brand font size for template 6
+  const blockBrandEl = document.getElementById('blockBrand');
+  blockBrandEl.style.fontSize = Math.round(fontSize * 0.75) + 'px';
+}
+
+/* ═══════════════════════════════════════════════════ */
+/*  EXPORT                                             */
+/* ═══════════════════════════════════════════════════ */
+async function exportPNG() {
+  const overlay = document.getElementById('exportOverlay');
+  overlay.classList.add('active');
+
+  const canvas = document.getElementById('cardCanvas');
+  const { w, h } = formats[state.format];
+
+  try {
+    // Temporarily remove border-radius for clean export
+    const origRadius = canvas.style.borderRadius;
+    // We keep the border radius in the export if set
+
+    const result = await html2canvas(canvas, {
+      width: w,
+      height: h,
+      scale: 1,
+      useCORS: true,
+      allowTaint: true,
+      backgroundColor: null,
+    });
+
+    const link = document.createElement('a');
+    link.download = 'kards-review.png';
+    link.href = result.toDataURL('image/png');
+    link.click();
+  } catch (err) {
+    console.error('Export failed:', err);
+    alert('Export failed. Please try again.');
+  }
+
+  setTimeout(() => overlay.classList.remove('active'), 300);
+}
+
+/* ═══════════════════════════════════════════════════ */
+/*  SCENE PRESETS                                      */
+/* ═══════════════════════════════════════════════════ */
+const scenePresets = [
+  { bg: null, rx: 0, ry: 0, rz: 0 },
+  { bg: 'linear-gradient(135deg,#ec4899,#8b5cf6)', rx: 4, ry: -8, rz: 2 },
+  { bg: 'linear-gradient(135deg,#f97316,#ef4444)', rx: 0, ry: 6, rz: -3 },
+  { bg: 'linear-gradient(135deg,#06b6d4,#3b82f6)', rx: 6, ry: 0, rz: 3 },
+  { bg: 'linear-gradient(135deg,#6366f1,#ec4899)', rx: 5, ry: 10, rz: 0 },
+  { bg: 'linear-gradient(135deg,#1a1a1a,#374151)', rx: 3, ry: -5, rz: 2 },
+  { bg: 'linear-gradient(135deg,#fda4af,#fecdd3)', rx: 0, ry: -7, rz: 2 },
+];
+
+let currentScene = 0;
+
+function setScene(idx) {
+  currentScene = idx;
+
+  // Update active state
+  document.querySelectorAll('.scene-card').forEach(c => {
+    c.classList.toggle('active', parseInt(c.dataset.scene) === idx);
+  });
+
+  // Only apply angle, not background
+  scalePreview();
+}
+
+// Sync scene card backgrounds with the current template
+function syncSceneCards() {
+  const tpl = state.template;
+  const defaults = templateDefaults[tpl];
+  let bg = defaults.bg;
+
+  // Use custom bg if set
+  if (state.customBg) bg = state.customBg;
+
+  // Template 3 is a gradient
+  if (tpl === 3 && !state.customBg) bg = 'linear-gradient(135deg, #f97316, #ef4444, #ec4899)';
+  // Template 6 split
+  if (tpl === 6 && !state.customBg) bg = '#1a1a1a';
+
+  const isDark = tpl === 2 || tpl === 5 || tpl === 6 || (bg && bg.charAt(0) === '#' && parseInt(bg.slice(1,3),16) < 80);
+
+  document.querySelectorAll('.scene-card').forEach(card => {
+    card.style.background = bg;
+  });
+  document.querySelectorAll('.scene-mini').forEach(mini => {
+    if (isDark) {
+      mini.style.background = '#ffffff';
+      mini.querySelector('.sm-line').style.background = 'rgba(0,0,0,0.2)';
+      mini.querySelector('.sm-line2').style.background = 'rgba(0,0,0,0.1)';
+    } else {
+      mini.style.background = '#1a1a1a';
+      mini.querySelector('.sm-line').style.background = 'rgba(255,255,255,0.3)';
+      mini.querySelector('.sm-line2').style.background = 'rgba(255,255,255,0.15)';
+    }
+  });
+}
+
+/* ═══════════════════════════════════════════════════ */
+/*  INIT                                               */
+/* ═══════════════════════════════════════════════════ */
+window.addEventListener('DOMContentLoaded', () => {
+  resizeCanvas();
+  updatePreview();
+  syncSceneCards();
+  // Init range track fills
+  document.querySelectorAll('input[type="range"]').forEach(updateRangeTrack);
+});
+window.addEventListener('resize', scalePreview);
+</script>
+</body>
+</html>
