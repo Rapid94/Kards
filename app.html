@@ -6,6 +6,7 @@
 <title>Kards — Editor</title>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@200;400;600;800&family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700;800&family=Space+Grotesk:wght@300;400;500;600;700&family=Cairo:wght@300;400;500;600;700;800&family=DM+Sans:wght@300;400;500;600;700&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://accounts.google.com/gsi/client" async defer></script>
 <style>
 @font-face {
   font-family: 'Product Sans';
@@ -466,6 +467,116 @@ textarea.field-input {
   min-height: 80px;
   line-height: 1.5;
 }
+
+/* Google Business Connect */
+.gbp-connect-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 16px;
+  background: #1a1a1a;
+  border: 1px solid #333;
+  border-radius: 8px;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-bottom: 12px;
+}
+.gbp-connect-btn:hover { border-color: #555; background: #222; }
+.gbp-connect-btn svg { width: 18px; height: 18px; flex-shrink: 0; }
+.gbp-connect-btn.connected { border-color: #34a853; }
+.gbp-connect-btn.connected:hover { border-color: #34a853; }
+
+.gbp-status {
+  font-size: 11px;
+  color: #888;
+  margin-bottom: 8px;
+  display: none;
+}
+.gbp-status.show { display: block; }
+.gbp-status.error { color: #e8685a; }
+.gbp-status.success { color: #34a853; }
+
+.gbp-review-list {
+  display: none;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 12px;
+  max-height: 240px;
+  overflow-y: auto;
+}
+.gbp-review-list.show { display: flex; }
+.gbp-review-list::-webkit-scrollbar { width: 4px; }
+.gbp-review-list::-webkit-scrollbar-track { background: transparent; }
+.gbp-review-list::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 4px; }
+
+.gbp-review-item {
+  padding: 10px 12px;
+  background: #1a1a1a;
+  border: 1px solid #333;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.gbp-review-item:hover { border-color: #555; }
+.gbp-review-item.selected { border-color: var(--coral); }
+.gbp-review-item .gbp-ri-stars { color: #f0c27f; font-size: 12px; margin-bottom: 4px; }
+.gbp-review-item .gbp-ri-text {
+  font-size: 12px;
+  color: #ccc;
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.gbp-review-item .gbp-ri-name {
+  font-size: 11px;
+  color: #888;
+  margin-top: 4px;
+}
+.gbp-review-item .gbp-ri-verified {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 10px;
+  color: #34a853;
+  margin-top: 4px;
+}
+
+.gbp-location-select {
+  width: 100%;
+  padding: 8px 12px;
+  background: #1a1a1a;
+  border: 1px solid #333;
+  border-radius: 8px;
+  color: #fff;
+  font-size: 12px;
+  font-family: inherit;
+  margin-bottom: 8px;
+  cursor: pointer;
+}
+.gbp-location-select:focus { outline: none; border-color: #555; }
+
+.gbp-divider {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 4px 0 12px;
+  font-size: 11px;
+  color: #555;
+}
+.gbp-divider::before, .gbp-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: #333;
+}
+
 /* Custom dropdown */
 .custom-dropdown {
   position: relative;
@@ -1550,6 +1661,17 @@ input[type="range"]::-moz-range-thumb {
       </button>
       <div class="pill-panel">
         <div class="pill-panel-inner"><div class="pill-panel-wrap">
+          <!-- Google Business Profile Connect -->
+          <div>
+            <button class="gbp-connect-btn" id="gbpConnectBtn" onclick="connectGoogleBusiness()">
+              <svg viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18A10.96 10.96 0 0 0 1 12c0 1.77.42 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+              Connect Google Business
+            </button>
+            <div class="gbp-status" id="gbpStatus"></div>
+            <select class="gbp-location-select" id="gbpLocationSelect" style="display:none" onchange="onLocationChange()"></select>
+            <div class="gbp-review-list" id="gbpReviewList"></div>
+            <div class="gbp-divider" id="gbpDivider" style="display:none">or type manually</div>
+          </div>
           <div>
             <label class="field-label">Review Text</label>
             <textarea class="field-input" id="reviewText" placeholder="Paste your Google review here..." oninput="updatePreview()">Collaborating on this project was seamless. The vision was clearly understood, and the designs genuinely reflect my brand identity.</textarea>
@@ -2886,6 +3008,186 @@ function syncAccentColor(hex) {
   // Update the illustration's accent circle
   const accentPath = document.querySelector('#cardMaleIllu .illu-accent');
   if (accentPath) accentPath.setAttribute('fill', hex);
+}
+
+/* ═══════════════════════════════════════════════════ */
+/*  GOOGLE BUSINESS PROFILE OAUTH                     */
+/* ═══════════════════════════════════════════════════ */
+const GBP_CLIENT_ID = '1031537345900-lgavj3p6spbn2uj77kh5spu3kkf3qeil.apps.googleusercontent.com';
+const GBP_SCOPES = 'https://www.googleapis.com/auth/business.manage';
+
+let gbpAccessToken = null;
+let gbpAccounts = [];
+let gbpLocations = [];
+let gbpReviews = [];
+
+function gbpStatus(msg, type) {
+  const el = document.getElementById('gbpStatus');
+  el.textContent = msg;
+  el.className = 'gbp-status show' + (type ? ' ' + type : '');
+}
+
+function connectGoogleBusiness() {
+  if (typeof google === 'undefined' || !google.accounts) {
+    gbpStatus('Google sign-in failed to load. Please refresh.', 'error');
+    return;
+  }
+
+  const tokenClient = google.accounts.oauth2.initTokenClient({
+    client_id: GBP_CLIENT_ID,
+    scope: GBP_SCOPES,
+    callback: (response) => {
+      if (response.error) {
+        gbpStatus('Sign-in cancelled or failed.', 'error');
+        return;
+      }
+      gbpAccessToken = response.access_token;
+      document.getElementById('gbpConnectBtn').classList.add('connected');
+      document.getElementById('gbpConnectBtn').innerHTML = `
+        <svg viewBox="0 0 24 24" fill="none" stroke="#34a853" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+        Connected
+      `;
+      gbpStatus('Fetching your business accounts...', '');
+      fetchAccounts();
+    },
+  });
+
+  tokenClient.requestAccessToken();
+}
+
+async function gbpFetch(url) {
+  const res = await fetch(url, {
+    headers: { 'Authorization': 'Bearer ' + gbpAccessToken }
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.error?.message || 'API request failed');
+  }
+  return res.json();
+}
+
+async function fetchAccounts() {
+  try {
+    const data = await gbpFetch('https://mybusinessaccountmanagement.googleapis.com/v1/accounts');
+    gbpAccounts = data.accounts || [];
+    if (gbpAccounts.length === 0) {
+      gbpStatus('No Google Business accounts found.', 'error');
+      return;
+    }
+    gbpStatus('Fetching locations...', '');
+    // Fetch locations for each account
+    for (const account of gbpAccounts) {
+      await fetchLocations(account.name);
+    }
+  } catch (e) {
+    gbpStatus('Error: ' + e.message, 'error');
+  }
+}
+
+async function fetchLocations(accountName) {
+  try {
+    const data = await gbpFetch(
+      `https://mybusinessbusinessinformation.googleapis.com/v1/${accountName}/locations?readMask=name,title,storefrontAddress`
+    );
+    const locations = (data.locations || []).map(loc => ({
+      ...loc,
+      accountName: accountName,
+    }));
+    gbpLocations = gbpLocations.concat(locations);
+
+    if (gbpLocations.length === 0) {
+      gbpStatus('No business locations found.', 'error');
+      return;
+    }
+
+    // Show location selector
+    const select = document.getElementById('gbpLocationSelect');
+    select.innerHTML = gbpLocations.map((loc, i) =>
+      `<option value="${i}">${loc.title || loc.name}</option>`
+    ).join('');
+    select.style.display = '';
+    document.getElementById('gbpDivider').style.display = '';
+
+    gbpStatus('Select a location to load reviews.', 'success');
+    // Auto-fetch reviews for first location
+    fetchReviews(0);
+  } catch (e) {
+    gbpStatus('Error fetching locations: ' + e.message, 'error');
+  }
+}
+
+async function fetchReviews(locationIndex) {
+  const loc = gbpLocations[locationIndex];
+  if (!loc) return;
+
+  gbpStatus('Loading reviews...', '');
+  try {
+    const data = await gbpFetch(
+      `https://mybusiness.googleapis.com/v4/${loc.accountName}/${loc.name.split('/').slice(-2).join('/')}/reviews`
+    );
+    gbpReviews = data.reviews || [];
+    if (gbpReviews.length === 0) {
+      gbpStatus('No reviews found for this location.', 'error');
+      document.getElementById('gbpReviewList').className = 'gbp-review-list';
+      return;
+    }
+
+    // Also set business name
+    document.getElementById('businessName').value = loc.title || '';
+
+    renderReviewList();
+    gbpStatus(gbpReviews.length + ' review(s) found. Click one to use it.', 'success');
+  } catch (e) {
+    gbpStatus('Error fetching reviews: ' + e.message, 'error');
+  }
+}
+
+function onLocationChange() {
+  const idx = parseInt(document.getElementById('gbpLocationSelect').value);
+  fetchReviews(idx);
+}
+
+function starRatingToNumber(rating) {
+  const map = { ONE: 1, TWO: 2, THREE: 3, FOUR: 4, FIVE: 5 };
+  return map[rating] || 5;
+}
+
+function renderReviewList() {
+  const list = document.getElementById('gbpReviewList');
+  list.innerHTML = gbpReviews.map((review, i) => {
+    const stars = starRatingToNumber(review.starRating);
+    const text = review.comment || '(No comment)';
+    const name = review.reviewer?.displayName || 'Anonymous';
+    return `
+      <div class="gbp-review-item" onclick="selectReview(${i})" data-idx="${i}">
+        <div class="gbp-ri-stars">${'★'.repeat(stars)}${'☆'.repeat(5 - stars)}</div>
+        <div class="gbp-ri-text">${text.replace(/</g, '&lt;')}</div>
+        <div class="gbp-ri-name">${name.replace(/</g, '&lt;')}</div>
+        <div class="gbp-ri-verified">
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+          Verified Google Review
+        </div>
+      </div>
+    `;
+  }).join('');
+  list.className = 'gbp-review-list show';
+}
+
+function selectReview(idx) {
+  const review = gbpReviews[idx];
+  if (!review) return;
+
+  // Fill form fields
+  document.getElementById('reviewText').value = review.comment || '';
+  document.getElementById('reviewerName').value = review.reviewer?.displayName || 'Anonymous';
+  setStars(starRatingToNumber(review.starRating));
+
+  // Highlight selected
+  document.querySelectorAll('.gbp-review-item').forEach(el => {
+    el.classList.toggle('selected', parseInt(el.dataset.idx) === idx);
+  });
+
+  updatePreview();
 }
 
 window.addEventListener('DOMContentLoaded', () => {
